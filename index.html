@@ -2,897 +2,982 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Servidor P2P - Material Design</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Servidor P2P Robusto - Material Design</title>
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-      /* CSS Material Design 3 completo e revisado */
-:root {
-    /* Paleta Primária */
-    --md-ref-palette-primary0: #000000;
-    --md-ref-palette-primary10: #001a41;
-    --md-ref-palette-primary20: #002e69;
-    --md-ref-palette-primary30: #004493;
-    --md-ref-palette-primary40: #005bbf;
-    --md-ref-palette-primary50: #2a75dc;
-    --md-ref-palette-primary60: #4d8ff8;
-    --md-ref-palette-primary70: #74a9ff;
-    --md-ref-palette-primary80: #9ec4ff;
-    --md-ref-palette-primary90: #d0e2ff;
-    --md-ref-palette-primary95: #eaf0ff;
-    --md-ref-palette-primary99: #fdfbff;
-    --md-ref-palette-primary100: #ffffff;
-
-    /* Paleta Secundária */
-    --md-ref-palette-secondary10: #0e1d37;
-    --md-ref-palette-secondary20: #24324d;
-    --md-ref-palette-secondary30: #3b4865;
-    --md-ref-palette-secondary40: #53607e;
-    --md-ref-palette-secondary50: #6b7998;
-    --md-ref-palette-secondary60: #8593b3;
-    --md-ref-palette-secondary70: #9fadce;
-    --md-ref-palette-secondary80: #bac8ea;
-    --md-ref-palette-secondary90: #d6e3ff;
-    --md-ref-palette-secondary95: #ecf0ff;
-
-    /* Paleta Terciária */
-    --md-ref-palette-tertiary10: #2c1250;
-    --md-ref-palette-tertiary20: #432968;
-    --md-ref-palette-tertiary30: #5b4082;
-    --md-ref-palette-tertiary40: #74589c;
-    --md-ref-palette-tertiary50: #8e71b8;
-    --md-ref-palette-tertiary60: #a98bd4;
-    --md-ref-palette-tertiary70: #c4a5f0;
-    --md-ref-palette-tertiary80: #dfc0ff;
-    --md-ref-palette-tertiary90: #f2dbff;
-    --md-ref-palette-tertiary95: #fbebff;
-
-    /* Paleta de Erro */
-    --md-ref-palette-error10: #410002;
-    --md-ref-palette-error20: #690005;
-    --md-ref-palette-error30: #93000a;
-    --md-ref-palette-error40: #ba1a1a;
-    --md-ref-palette-error50: #de3730;
-    --md-ref-palette-error60: #ff5449;
-    --md-ref-palette-error70: #ff897d;
-    --md-ref-palette-error80: #ffb4ab;
-    --md-ref-palette-error90: #ffdad6;
-    --md-ref-palette-error95: #ffedea;
-
-    /* Paleta Neutra */
-    --md-ref-palette-neutral10: #1a1c1e;
-    --md-ref-palette-neutral20: #2f3033;
-    --md-ref-palette-neutral30: #45474a;
-    --md-ref-palette-neutral40: #5d5e62;
-    --md-ref-palette-neutral50: #76777a;
-    --md-ref-palette-neutral60: #909094;
-    --md-ref-palette-neutral70: #aaabae;
-    --md-ref-palette-neutral80: #c6c6ca;
-    --md-ref-palette-neutral90: #e2e2e6;
-    --md-ref-palette-neutral95: #f1f0f4;
-    --md-ref-palette-neutral99: #fdfbff;
-    --md-ref-palette-neutral100: #ffffff;
-
-    /* Cores do Sistema */
-    --md-sys-color-primary: var(--md-ref-palette-primary40);
-    --md-sys-color-on-primary: var(--md-ref-palette-primary100);
-    --md-sys-color-primary-container: var(--md-ref-palette-primary90);
-    --md-sys-color-on-primary-container: var(--md-ref-palette-primary10);
-    
-    --md-sys-color-secondary: var(--md-ref-palette-secondary40);
-    --md-sys-color-on-secondary: var(--md-ref-palette-primary100);
-    --md-sys-color-secondary-container: var(--md-ref-palette-secondary90);
-    --md-sys-color-on-secondary-container: var(--md-ref-palette-secondary10);
-    
-    --md-sys-color-tertiary: var(--md-ref-palette-tertiary40);
-    --md-sys-color-on-tertiary: var(--md-ref-palette-primary100);
-    --md-sys-color-tertiary-container: var(--md-ref-palette-tertiary90);
-    --md-sys-color-on-tertiary-container: var(--md-ref-palette-tertiary10);
-    
-    --md-sys-color-error: var(--md-ref-palette-error40);
-    --md-sys-color-on-error: var(--md-ref-palette-primary100);
-    --md-sys-color-error-container: var(--md-ref-palette-error90);
-    --md-sys-color-on-error-container: var(--md-ref-palette-error10);
-    
-    --md-sys-color-background: var(--md-ref-palette-neutral99);
-    --md-sys-color-on-background: var(--md-ref-palette-neutral10);
-    
-    --md-sys-color-surface: var(--md-ref-palette-neutral99);
-    --md-sys-color-on-surface: var(--md-ref-palette-neutral10);
-    --md-sys-color-surface-variant: var(--md-ref-palette-neutral90);
-    --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral30);
-    
-    --md-sys-color-outline: var(--md-ref-palette-neutral50);
-    --md-sys-color-outline-variant: var(--md-ref-palette-neutral80);
-    
-    --md-sys-color-shadow: var(--md-ref-palette-neutral0);
-    --md-sys-color-surface-tint: var(--md-ref-palette-primary40);
-    
-    --md-sys-color-inverse-surface: var(--md-ref-palette-neutral20);
-    --md-sys-color-inverse-on-surface: var(--md-ref-palette-neutral95);
-    --md-sys-color-inverse-primary: var(--md-ref-palette-primary80);
-    
-    /* Elevação (Sombras) */
-    --elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
-    --elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
-    --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
-    --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);
-    --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px rgba(0,0,0,0.3);
-    
-    /* Raio da Borda */
-    --radius-small: 8px;
-    --radius-medium: 12px;
-    --radius-large: 16px;
-    --radius-extra-large: 28px;
-    
-    /* Animações */
-    --animation-duration-short: 200ms;
-    --animation-duration-medium: 300ms;
-    --animation-duration-long: 500ms;
-}
-
-/* Reset Global e Configurações Base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    max-width: 100%; /* Previne overflow horizontal */
-}
-
-html {
-    font-size: 16px;
-    height: 100%;
-    overflow: hidden;
-}
-
-body {
-    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
-    background-color: var(--md-sys-color-background);
-    color: var(--md-sys-color-on-background);
-    line-height: 1.5;
-    height: 100vh;
-    height: 100dvh; /* Altura dinâmica da viewport */
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    touch-action: manipulation;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Layout Principal */
-.app-container {
-    display: flex;
-    min-height: 100vh;
-    min-height: 100dvh;
-    width: 100%;
-    position: relative;
-}
-
-/* Barra de Navegação Lateral (Nav Drawer) */
-.nav-drawer {
-    width: min(280px, 85vw);
-    background: var(--md-sys-color-surface);
-    border-right: 1px solid var(--md-sys-color-outline-variant);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    height: 100vh;
-    height: 100dvh;
-    z-index: 1000;
-    transform: translateX(0);
-    transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.nav-drawer.hidden {
-    transform: translateX(-100%);
-}
-
-.nav-header {
-    padding: clamp(16px, 4vw, 24px) clamp(12px, 3vw, 16px) clamp(12px, 3vw, 16px);
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    position: sticky;
-    top: 0;
-    background: var(--md-sys-color-surface);
-    z-index: 1;
-}
-
-.app-title {
-    font-size: clamp(18px, 4vw, 22px);
-    font-weight: 500;
-    color: var(--md-sys-color-primary);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    word-break: break-word;
-}
-
-.nav-items {
-    flex: 1;
-    padding: clamp(8px, 2vw, 16px) 0;
-    overflow-y: auto;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px);
-    text-decoration: none;
-    color: var(--md-sys-color-on-surface-variant);
-    transition: all var(--animation-duration-short) ease;
-    border-radius: var(--radius-medium);
-    margin: 0 clamp(4px, 1vw, 8px) 4px;
-    font-size: clamp(14px, 3vw, 16px);
-}
-
-.nav-item.active {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-    font-weight: 500;
-}
-
-.nav-item:hover:not(.active) {
-    background-color: rgba(0,0,0,0.04);
-}
-
-.nav-footer {
-    padding: 16px;
-    border-top: 1px solid var(--md-sys-color-outline-variant);
-}
-
-.connection-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--md-sys-color-on-surface-variant);
-}
-
-.status-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-.status-indicator.online { background-color: #4CAF50; }
-.status-indicator.connecting { background-color: #FFC107; }
-.status-indicator.offline { background-color: #F44336; }
-
-/* Conteúdo Principal */
-.main-content {
-    flex: 1;
-    margin-left: min(280px, 85vw);
-    transition: margin-left var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.main-content.expanded {
-    margin-left: 0;
-}
-
-/* Barra Superior (Top App Bar) */
-.top-app-bar {
-    background: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
-    display: flex;
-    align-items: center;
-    gap: clamp(8px, 2vw, 16px);
-    box-shadow: var(--elevation-1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    min-height: 64px;
-    flex-shrink: 0;
-}
-
-.menu-button, .icon-button {
-    background: none;
-    border: none;
-    color: var(--md-sys-color-on-surface);
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color var(--animation-duration-short) ease;
-    min-width: 44px;
-    min-height: 44px;
-    position: relative;
-}
-.menu-button:hover, .icon-button:hover {
-    background-color: rgba(0,0,0,0.08);
-}
-
-.page-title {
-    font-size: clamp(18px, 4vw, 22px);
-    font-weight: 500;
-    flex: 1;
-    word-break: break-word;
-    line-height: 1.2;
-}
-
-.top-actions {
-    display: flex;
-    align-items: center;
-}
-
-.badge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background-color: var(--md-sys-color-error);
-    color: var(--md-sys-color-on-error);
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    font-size: 10px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-
-/* Conteúdo da Página */
-.page-content {
-    padding: clamp(12px, 3vw, 24px);
-    max-width: 100%;
-    margin: 0 auto;
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    scroll-behavior: smooth;
-}
-
-/* Cards */
-.card {
-    background: var(--md-sys-color-surface);
-    border-radius: var(--radius-large);
-    box-shadow: var(--elevation-1);
-    overflow: hidden;
-    margin-bottom: clamp(16px, 3vw, 24px);
-    transition: box-shadow var(--animation-duration-short) ease;
-    max-width: 100%;
-}
-.card:hover {
-    box-shadow: var(--elevation-2);
-}
-
-.card-header {
-    padding: clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 0;
-}
-
-.card-title {
-    font-size: clamp(18px, 4vw, 22px);
-    font-weight: 500;
-    color: var(--md-sys-color-on-surface);
-    margin-bottom: 8px;
-    word-break: break-word;
-}
-
-.card-subtitle {
-    font-size: clamp(13px, 2.5vw, 14px);
-    color: var(--md-sys-color-on-surface-variant);
-    margin-bottom: clamp(12px, 2.5vw, 16px);
-}
-
-.card-content {
-    padding: 0 clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px);
-}
-
-/* Formulários */
-.form-group {
-    margin-bottom: clamp(16px, 3vw, 24px);
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: clamp(13px, 2.5vw, 14px);
-    font-weight: 500;
-    color: var(--md-sys-color-on-surface);
-}
-
-.text-field {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.text-field input,
-.text-field textarea,
-.text-field select {
-    width: 100%;
-    padding: clamp(12px, 3vw, 16px);
-    border: 1px solid var(--md-sys-color-outline);
-    border-radius: var(--radius-medium);
-    background: var(--md-sys-color-surface);
-    color: var(--md-sys-color-on-surface);
-    font-size: clamp(14px, 3vw, 16px);
-    transition: all var(--animation-duration-short) ease;
-    min-height: 44px;
-}
-.text-field input:focus,
-.text-field textarea:focus,
-.text-field select:focus {
-    outline: none;
-    border-color: var(--md-sys-color-primary);
-    box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
-}
-.text-field .material-icons {
-    position: absolute;
-    right: 16px;
-    color: var(--md-sys-color-on-surface-variant);
-    cursor: pointer;
-}
-.text-field select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-right: 40px;
-}
-input[type="file"] {
-    padding: 12px;
-}
-
-/* Botões */
-.button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: clamp(10px, 2.5vw, 12px) clamp(16px, 3vw, 24px);
-    border: none;
-    border-radius: var(--radius-extra-large);
-    font-size: clamp(13px, 2.5vw, 14px);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all var(--animation-duration-short) ease;
-    text-decoration: none;
-    min-height: 44px;
-    min-width: 44px;
-    vertical-align: middle;
-}
-.button.primary {
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-}
-.button.primary:hover {
-    box-shadow: var(--elevation-1);
-    transform: translateY(-1px);
-}
-.button.outlined {
-    background-color: transparent;
-    color: var(--md-sys-color-primary);
-    border: 1px solid var(--md-sys-color-outline);
-}
-.button.outlined:hover {
-    background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
-}
-.button.text {
-    background-color: transparent;
-    color: var(--md-sys-color-primary);
-    padding: 10px 12px;
-}
-.button.text:hover {
-    background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
-}
-
-/* Listas */
-.list {
-    list-style-type: none;
-}
-.list-item {
-    display: flex;
-    align-items: center;
-    gap: clamp(12px, 3vw, 16px);
-    padding: clamp(12px, 3vw, 16px);
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    transition: background-color var(--animation-duration-short) ease;
-    min-height: 64px;
-}
-.list-item:last-child {
-    border-bottom: none;
-}
-.list-item:hover {
-    background-color: rgba(0,0,0,0.04);
-}
-
-.list-item-icon {
-    width: clamp(36px, 8vw, 40px);
-    height: clamp(36px, 8vw, 40px);
-    border-radius: 50%;
-    background: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.list-item-content {
-    flex: 1;
-}
-
-.list-item-title {
-    font-size: clamp(14px, 3vw, 16px);
-    font-weight: 500;
-    color: var(--md-sys-color-on-surface);
-    word-break: break-word;
-}
-
-.list-item-subtitle {
-    font-size: clamp(13px, 2.5vw, 14px);
-    color: var(--md-sys-color-on-surface-variant);
-    word-break: break-word;
-}
-
-/* Grid de Estatísticas */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
-    gap: clamp(12px, 3vw, 16px);
-    margin: clamp(16px, 3vw, 24px) 0;
-}
-
-.stat-card {
-    background: var(--md-sys-color-surface);
-    border-radius: var(--radius-large);
-    padding: clamp(16px, 3vw, 24px);
-    box-shadow: var(--elevation-1);
-    transition: box-shadow var(--animation-duration-short) ease;
-    text-align: center;
-}
-.stat-card:hover {
-    box-shadow: var(--elevation-2);
-}
-
-.stat-value {
-    font-size: clamp(24px, 6vw, 36px);
-    font-weight: 300;
-    color: var(--md-sys-color-primary);
-    line-height: 1;
-    margin-bottom: 8px;
-    word-break: break-all;
-}
-
-.stat-label {
-    font-size: clamp(12px, 2.5vw, 14px);
-    color: var(--md-sys-color-on-surface-variant);
-}
-
-/* FAB (Floating Action Button) */
-.fab {
-    position: fixed;
-    bottom: clamp(16px, 4vw, 24px);
-    right: clamp(16px, 4vw, 24px);
-    width: clamp(48px, 10vw, 56px);
-    height: clamp(48px, 10vw, 56px);
-    border-radius: 50%;
-    background: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
-    border: none;
-    box-shadow: var(--elevation-3);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--animation-duration-short) ease;
-    z-index: 100;
-    min-width: 44px;
-    min-height: 44px;
-}
-.fab:hover {
-    box-shadow: var(--elevation-4);
-    transform: scale(1.05);
-}
-
-/* Snackbar (Notificações) */
-.snackbar {
-    position: fixed;
-    bottom: clamp(16px, 4vw, 24px);
-    left: 50%;
-    transform: translateX(-50%) translateY(120%);
-    background: var(--md-sys-color-inverse-surface);
-    color: var(--md-sys-color-inverse-on-surface);
-    padding: clamp(12px, 3vw, 14px) clamp(12px, 3vw, 16px);
-    border-radius: var(--radius-medium);
-    box-shadow: var(--elevation-3);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    max-width: min(600px, calc(100vw - 48px));
-    width: calc(100% - 48px);
-    z-index: 10000;
-    transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
-}
-.snackbar.show {
-    transform: translateX(-50%) translateY(0);
-}
-
-.snackbar-content {
-    flex: 1;
-}
-.snackbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.snackbar .button.text {
-    color: var(--md-sys-color-inverse-primary);
-}
-.snackbar .icon-button {
-    color: var(--md-sys-color-inverse-on-surface);
-}
-
-/* Tabs */
-.tabs {
-    display: flex;
-    border-bottom: 1px solid var(--md-sys-color-outline-variant);
-    margin-bottom: clamp(16px, 3vw, 24px);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-.tab {
-    padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
-    background: none;
-    border: none;
-    color: var(--md-sys-color-on-surface-variant);
-    font-size: clamp(12px, 2.5vw, 14px);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all var(--animation-duration-short) ease;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    min-height: 44px;
-}
-.tab.active {
-    color: var(--md-sys-color-primary);
-    border-bottom-color: var(--md-sys-color-primary);
-}
-
-/* Conteúdo das Tabs */
-.tab-content {
-    display: none;
-}
-.tab-content.active {
-    display: block;
-}
-
-/* Componentes Adicionais */
-.progress-container {
-    margin-top: 16px;
-}
-.progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--md-sys-color-on-surface-variant);
-    margin-bottom: 4px;
-}
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background-color: var(--md-sys-color-surface-variant);
-    border-radius: 3px;
-    overflow: hidden;
-}
-.progress-fill {
-    height: 100%;
-    background-color: var(--md-sys-color-primary);
-    border-radius: 3px;
-    transition: width var(--animation-duration-medium) ease;
-}
-
-.chips-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-}
-.chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background-color: var(--md-sys-color-surface-variant);
-    color: var(--md-sys-color-on-surface-variant);
-    padding: 6px 12px;
-    border-radius: var(--radius-small);
-    font-size: 13px;
-}
-.chip.primary {
-    background-color: var(--md-sys-color-primary-container);
-    color: var(--md-sys-color-on-primary-container);
-}
-
-.search-container {
-    position: relative;
-    margin-bottom: 16px;
-}
-.search-icon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--md-sys-color-on-surface-variant);
-}
-.search-field {
-    padding-left: 48px !important;
-}
-
-/* Animações */
-.fade-in {
-    animation: fadeIn var(--animation-duration-medium) ease-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* MEDIA QUERIES */
-
-/* Tablets e menores (768px) */
-@media (max-width: 768px) {
-    .nav-drawer {
-        transform: translateX(-100%);
-        width: 85vw;
-    }
-
-    .nav-drawer.mobile-open {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0;
-    }
-
-    .page-content {
-        padding: 12px;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    }
-}
-
-/* Celulares grandes e menores (480px) */
-@media (max-width: 480px) {
-    .top-app-bar {
-        padding: 8px 12px;
-        gap: 8px;
-    }
-
-    .page-content {
-        padding: 8px;
-    }
-
-    .card-header, .card-content {
-        padding-left: 16px;
-        padding-right: 16px;
-    }
-
-    .button {
-        padding: 10px 16px;
-        font-size: 13px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-/* Celulares pequenos (360px) */
-@media (max-width: 360px) {
-    .nav-drawer {
-        width: 90vw;
-    }
-
-    .page-content {
-        padding: 6px;
-    }
-    
-    .card-header, .card-content {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .button {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-}
-
-/* Orientação paisagem em celulares */
-@media (max-height: 500px) and (orientation: landscape) {
-    .top-app-bar {
-        min-height: 56px;
-        padding: 6px 12px;
-    }
-
-    .page-content {
-        padding: 8px;
-    }
-
-    .nav-drawer {
-        overflow-y: auto;
-    }
-}
-
-/* Prevenir zoom em inputs no iOS */
-@media screen and (max-width: 768px) {
-    input, textarea, select {
-        font-size: 16px !important;
-    }
-}
-
-/* Melhorias de toque */
-@media (hover: none) and (pointer: coarse) {
-    .button:hover, .fab:hover {
-        transform: none;
-    }
-    
-    .card:hover {
-        box-shadow: var(--elevation-1);
-    }
-    
-    .nav-item:hover {
-        background-color: transparent;
-    }
-    
-    .nav-item:active {
-        background-color: var(--md-sys-color-surface-variant);
-    }
-}
-
-/* Classes Utilitárias */
-.hidden {
-    display: none !important;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.mt-16 {
-    margin-top: clamp(12px, 3vw, 16px);
-}
-
-.mb-16 {
-    margin-bottom: clamp(12px, 3vw, 16px);
-}
-
-.p-16 {
-    padding: clamp(12px, 3vw, 16px);
-}
-
-.w-full {
-    width: 100%;
-}
-
-/* Mídia responsiva */
-img, video, iframe {
-    max-width: 100%;
-    height: auto;
-}
-
+        /* CSS Material Design 3 completo e revisado */
+        :root {
+            /* Paleta Primária */
+            --md-ref-palette-primary0: #000000;
+            --md-ref-palette-primary10: #001a41;
+            --md-ref-palette-primary20: #002e69;
+            --md-ref-palette-primary30: #004493;
+            --md-ref-palette-primary40: #005bbf;
+            --md-ref-palette-primary50: #2a75dc;
+            --md-ref-palette-primary60: #4d8ff8;
+            --md-ref-palette-primary70: #74a9ff;
+            --md-ref-palette-primary80: #9ec4ff;
+            --md-ref-palette-primary90: #d0e2ff;
+            --md-ref-palette-primary95: #eaf0ff;
+            --md-ref-palette-primary99: #fdfbff;
+            --md-ref-palette-primary100: #ffffff;
+
+            /* Paleta Secundária */
+            --md-ref-palette-secondary10: #0e1d37;
+            --md-ref-palette-secondary20: #24324d;
+            --md-ref-palette-secondary30: #3b4865;
+            --md-ref-palette-secondary40: #53607e;
+            --md-ref-palette-secondary50: #6b7998;
+            --md-ref-palette-secondary60: #8593b3;
+            --md-ref-palette-secondary70: #9fadce;
+            --md-ref-palette-secondary80: #bac8ea;
+            --md-ref-palette-secondary90: #d6e3ff;
+            --md-ref-palette-secondary95: #ecf0ff;
+
+            /* Paleta Terciária */
+            --md-ref-palette-tertiary10: #2c1250;
+            --md-ref-palette-tertiary20: #432968;
+            --md-ref-palette-tertiary30: #5b4082;
+            --md-ref-palette-tertiary40: #74589c;
+            --md-ref-palette-tertiary50: #8e71b8;
+            --md-ref-palette-tertiary60: #a98bd4;
+            --md-ref-palette-tertiary70: #c4a5f0;
+            --md-ref-palette-tertiary80: #dfc0ff;
+            --md-ref-palette-tertiary90: #f2dbff;
+            --md-ref-palette-tertiary95: #fbebff;
+
+            /* Paleta de Erro */
+            --md-ref-palette-error10: #410002;
+            --md-ref-palette-error20: #690005;
+            --md-ref-palette-error30: #93000a;
+            --md-ref-palette-error40: #ba1a1a;
+            --md-ref-palette-error50: #de3730;
+            --md-ref-palette-error60: #ff5449;
+            --md-ref-palette-error70: #ff897d;
+            --md-ref-palette-error80: #ffb4ab;
+            --md-ref-palette-error90: #ffdad6;
+            --md-ref-palette-error95: #ffedea;
+
+            /* Paleta Neutra */
+            --md-ref-palette-neutral10: #1a1c1e;
+            --md-ref-palette-neutral20: #2f3033;
+            --md-ref-palette-neutral30: #45474a;
+            --md-ref-palette-neutral40: #5d5e62;
+            --md-ref-palette-neutral50: #76777a;
+            --md-ref-palette-neutral60: #909094;
+            --md-ref-palette-neutral70: #aaabae;
+            --md-ref-palette-neutral80: #c6c6ca;
+            --md-ref-palette-neutral90: #e2e2e6;
+            --md-ref-palette-neutral95: #f1f0f4;
+            --md-ref-palette-neutral99: #fdfbff;
+            --md-ref-palette-neutral100: #ffffff;
+
+            /* Cores do Sistema */
+            --md-sys-color-primary: var(--md-ref-palette-primary40);
+            --md-sys-color-on-primary: var(--md-ref-palette-primary100);
+            --md-sys-color-primary-container: var(--md-ref-palette-primary90);
+            --md-sys-color-on-primary-container: var(--md-ref-palette-primary10);
+            
+            --md-sys-color-secondary: var(--md-ref-palette-secondary40);
+            --md-sys-color-on-secondary: var(--md-ref-palette-primary100);
+            --md-sys-color-secondary-container: var(--md-ref-palette-secondary90);
+            --md-sys-color-on-secondary-container: var(--md-ref-palette-secondary10);
+            
+            --md-sys-color-tertiary: var(--md-ref-palette-tertiary40);
+            --md-sys-color-on-tertiary: var(--md-ref-palette-primary100);
+            --md-sys-color-tertiary-container: var(--md-ref-palette-tertiary90);
+            --md-sys-color-on-tertiary-container: var(--md-ref-palette-tertiary10);
+            
+            --md-sys-color-error: var(--md-ref-palette-error40);
+            --md-sys-color-on-error: var(--md-ref-palette-primary100);
+            --md-sys-color-error-container: var(--md-ref-palette-error90);
+            --md-sys-color-on-error-container: var(--md-ref-palette-error10);
+            
+            --md-sys-color-background: var(--md-ref-palette-neutral99);
+            --md-sys-color-on-background: var(--md-ref-palette-neutral10);
+            
+            --md-sys-color-surface: var(--md-ref-palette-neutral99);
+            --md-sys-color-on-surface: var(--md-ref-palette-neutral10);
+            --md-sys-color-surface-variant: var(--md-ref-palette-neutral90);
+            --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral30);
+            
+            --md-sys-color-outline: var(--md-ref-palette-neutral50);
+            --md-sys-color-outline-variant: var(--md-ref-palette-neutral80);
+            
+            --md-sys-color-shadow: var(--md-ref-palette-neutral0);
+            --md-sys-color-surface-tint: var(--md-ref-palette-primary40);
+            
+            --md-sys-color-inverse-surface: var(--md-ref-palette-neutral20);
+            --md-sys-color-inverse-on-surface: var(--md-ref-palette-neutral95);
+            --md-sys-color-inverse-primary: var(--md-ref-palette-primary80);
+            
+            /* Elevação (Sombras) */
+            --elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+            --elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
+            --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
+            --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);
+            --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px rgba(0,0,0,0.3);
+            
+            /* Raio da Borda */
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 16px;
+            --radius-extra-large: 28px;
+            
+            /* Animações */
+            --animation-duration-short: 200ms;
+            --animation-duration-medium: 300ms;
+            --animation-duration-long: 500ms;
+        }
+
+        /* Reset Global e Configurações Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            max-width: 100%; /* Previne overflow horizontal */
+        }
+
+        html {
+            font-size: 16px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--md-sys-color-background);
+            color: var(--md-sys-color-on-background);
+            line-height: 1.5;
+            height: 100vh;
+            height: 100dvh; /* Altura dinâmica da viewport */
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            min-height: 100dvh;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Barra de Navegação Lateral (Nav Drawer) */
+        .nav-drawer {
+            width: min(280px, 85vw);
+            background: var(--md-sys-color-surface);
+            border-right: 1px solid var(--md-sys-color-outline-variant);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            height: 100dvh;
+            z-index: 1000;
+            transform: translateX(0);
+            transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-drawer.hidden {
+            transform: translateX(-100%);
+        }
+
+        .nav-header {
+            padding: clamp(16px, 4vw, 24px) clamp(12px, 3vw, 16px) clamp(12px, 3vw, 16px);
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            position: sticky;
+            top: 0;
+            background: var(--md-sys-color-surface);
+            z-index: 1;
+        }
+
+        .app-title {
+            font-size: clamp(18px, 4vw, 22px);
+            font-weight: 500;
+            color: var(--md-sys-color-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            word-break: break-word;
+        }
+
+        .nav-items {
+            flex: 1;
+            padding: clamp(8px, 2vw, 16px) 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px);
+            text-decoration: none;
+            color: var(--md-sys-color-on-surface-variant);
+            transition: all var(--animation-duration-short) ease;
+            border-radius: var(--radius-medium);
+            margin: 0 clamp(4px, 1vw, 8px) 4px;
+            font-size: clamp(14px, 3vw, 16px);
+        }
+
+        .nav-item.active {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            font-weight: 500;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: rgba(0,0,0,0.04);
+        }
+
+        .nav-footer {
+            padding: 16px;
+            border-top: 1px solid var(--md-sys-color-outline-variant);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .status-indicator.online { background-color: #4CAF50; }
+        .status-indicator.connecting { background-color: #FFC107; }
+        .status-indicator.offline { background-color: #F44336; }
+
+        /* Conteúdo Principal */
+        .main-content {
+            flex: 1;
+            margin-left: min(280px, 85vw);
+            transition: margin-left var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Barra Superior (Top App Bar) */
+        .top-app-bar {
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
+            display: flex;
+            align-items: center;
+            gap: clamp(8px, 2vw, 16px);
+            box-shadow: var(--elevation-1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 64px;
+            flex-shrink: 0;
+        }
+
+        .menu-button, .icon-button {
+            background: none;
+            border: none;
+            color: var(--md-sys-color-on-surface);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color var(--animation-duration-short) ease;
+            min-width: 44px;
+            min-height: 44px;
+            position: relative;
+        }
+        .menu-button:hover, .icon-button:hover {
+            background-color: rgba(0,0,0,0.08);
+        }
+
+        .page-title {
+            font-size: clamp(18px, 4vw, 22px);
+            font-weight: 500;
+            flex: 1;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background-color: var(--md-sys-color-error);
+            color: var(--md-sys-color-on-error);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Conteúdo da Página */
+        .page-content {
+            padding: clamp(12px, 3vw, 24px);
+            max-width: 100%;
+            margin: 0 auto;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            scroll-behavior: smooth;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--md-sys-color-surface);
+            border-radius: var(--radius-large);
+            box-shadow: var(--elevation-1);
+            overflow: hidden;
+            margin-bottom: clamp(16px, 3vw, 24px);
+            transition: box-shadow var(--animation-duration-short) ease;
+            max-width: 100%;
+        }
+        .card:hover {
+            box-shadow: var(--elevation-2);
+        }
+
+        .card-header {
+            padding: clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 0;
+        }
+
+        .card-title {
+            font-size: clamp(18px, 4vw, 22px);
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .card-subtitle {
+            font-size: clamp(13px, 2.5vw, 14px);
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: clamp(12px, 2.5vw, 16px);
+        }
+
+        .card-content {
+            padding: 0 clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px);
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: clamp(16px, 3vw, 24px);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: clamp(13px, 2.5vw, 14px);
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+        }
+
+        .text-field {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .text-field input,
+        .text-field textarea,
+        .text-field select {
+            width: 100%;
+            padding: clamp(12px, 3vw, 16px);
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: var(--radius-medium);
+            background: var(--md-sys-color-surface);
+            color: var(--md-sys-color-on-surface);
+            font-size: clamp(14px, 3vw, 16px);
+            transition: all var(--animation-duration-short) ease;
+            min-height: 44px;
+        }
+        .text-field input:focus,
+        .text-field textarea:focus,
+        .text-field select:focus {
+            outline: none;
+            border-color: var(--md-sys-color-primary);
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+        }
+        .text-field .material-icons {
+            position: absolute;
+            right: 16px;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+        }
+        .text-field select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            padding-right: 40px;
+        }
+        input[type="file"] {
+            padding: 12px;
+        }
+
+        /* Botões */
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: clamp(10px, 2.5vw, 12px) clamp(16px, 3vw, 24px);
+            border: none;
+            border-radius: var(--radius-extra-large);
+            font-size: clamp(13px, 2.5vw, 14px);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all var(--animation-duration-short) ease;
+            text-decoration: none;
+            min-height: 44px;
+            min-width: 44px;
+            vertical-align: middle;
+        }
+        .button.primary {
+            background-color: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+        .button.primary:hover {
+            box-shadow: var(--elevation-1);
+            transform: translateY(-1px);
+        }
+        .button.outlined {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            border: 1px solid var(--md-sys-color-outline);
+        }
+        .button.outlined:hover {
+            background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
+        }
+        .button.text {
+            background-color: transparent;
+            color: var(--md-sys-color-primary);
+            padding: 10px 12px;
+        }
+        .button.text:hover {
+            background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
+        }
+
+        /* Listas */
+        .list {
+            list-style-type: none;
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 3vw, 16px);
+            padding: clamp(12px, 3vw, 16px);
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            transition: background-color var(--animation-duration-short) ease;
+            min-height: 64px;
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .list-item:hover {
+            background-color: rgba(0,0,0,0.04);
+        }
+
+        .list-item-icon {
+            width: clamp(36px, 8vw, 40px);
+            height: clamp(36px, 8vw, 40px);
+            border-radius: 50%;
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .list-item-content {
+            flex: 1;
+        }
+
+        .list-item-title {
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+            word-break: break-word;
+        }
+
+        .list-item-subtitle {
+            font-size: clamp(13px, 2.5vw, 14px);
+            color: var(--md-sys-color-on-surface-variant);
+            word-break: break-word;
+        }
+
+        /* Grid de Estatísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: clamp(12px, 3vw, 16px);
+            margin: clamp(16px, 3vw, 24px) 0;
+        }
+
+        .stat-card {
+            background: var(--md-sys-color-surface);
+            border-radius: var(--radius-large);
+            padding: clamp(16px, 3vw, 24px);
+            box-shadow: var(--elevation-1);
+            transition: box-shadow var(--animation-duration-short) ease;
+            text-align: center;
+        }
+        .stat-card:hover {
+            box-shadow: var(--elevation-2);
+        }
+
+        .stat-value {
+            font-size: clamp(24px, 6vw, 36px);
+            font-weight: 300;
+            color: var(--md-sys-color-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .stat-label {
+            font-size: clamp(12px, 2.5vw, 14px);
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* FAB (Floating Action Button) */
+        .fab {
+            position: fixed;
+            bottom: clamp(16px, 4vw, 24px);
+            right: clamp(16px, 4vw, 24px);
+            width: clamp(48px, 10vw, 56px);
+            height: clamp(48px, 10vw, 56px);
+            border-radius: 50%;
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            box-shadow: var(--elevation-3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--animation-duration-short) ease;
+            z-index: 100;
+            min-width: 44px;
+            min-height: 44px;
+        }
+        .fab:hover {
+            box-shadow: var(--elevation-4);
+            transform: scale(1.05);
+        }
+
+        /* Snackbar (Notificações) */
+        .snackbar {
+            position: fixed;
+            bottom: clamp(16px, 4vw, 24px);
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: var(--md-sys-color-inverse-surface);
+            color: var(--md-sys-color-inverse-on-surface);
+            padding: clamp(12px, 3vw, 14px) clamp(12px, 3vw, 16px);
+            border-radius: var(--radius-medium);
+            box-shadow: var(--elevation-3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            max-width: min(600px, calc(100vw - 48px));
+            width: calc(100% - 48px);
+            z-index: 10000;
+            transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .snackbar.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .snackbar-content {
+            flex: 1;
+        }
+        .snackbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .snackbar .button.text {
+            color: var(--md-sys-color-inverse-primary);
+        }
+        .snackbar .icon-button {
+            color: var(--md-sys-color-inverse-on-surface);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--md-sys-color-outline-variant);
+            margin-bottom: clamp(16px, 3vw, 24px);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
+            background: none;
+            border: none;
+            color: var(--md-sys-color-on-surface-variant);
+            font-size: clamp(12px, 2.5vw, 14px);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all var(--animation-duration-short) ease;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+        .tab.active {
+            color: var(--md-sys-color-primary);
+            border-bottom-color: var(--md-sys-color-primary);
+        }
+
+        /* Conteúdo das Tabs */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Componentes Adicionais */
+        .progress-container {
+            margin-top: 16px;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--md-sys-color-on-surface-variant);
+            margin-bottom: 4px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--md-sys-color-surface-variant);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: var(--md-sys-color-primary);
+            border-radius: 3px;
+            transition: width var(--animation-duration-medium) ease;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: var(--md-sys-color-surface-variant);
+            color: var(--md-sys-color-on-surface-variant);
+            padding: 6px 12px;
+            border-radius: var(--radius-small);
+            font-size: 13px;
+        }
+        .chip.primary {
+            background-color: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--md-sys-color-on-surface-variant);
+        }
+        .search-field {
+            padding-left: 48px !important;
+        }
+
+        /* Animações */
+        .fade-in {
+            animation: fadeIn var(--animation-duration-medium) ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MEDIA QUERIES */
+
+        /* Tablets e menores (768px) */
+        @media (max-width: 768px) {
+            .nav-drawer {
+                transform: translateX(-100%);
+                width: 85vw;
+            }
+
+            .nav-drawer.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-content {
+                padding: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+
+        /* Celulares grandes e menores (480px) */
+        @media (max-width: 480px) {
+            .top-app-bar {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .page-content {
+                padding: 8px;
+            }
+
+            .card-header, .card-content {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Celulares pequenos (360px) */
+        @media (max-width: 360px) {
+            .nav-drawer {
+                width: 90vw;
+            }
+
+            .page-content {
+                padding: 6px;
+            }
+            
+            .card-header, .card-content {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Orientação paisagem em celulares */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .top-app-bar {
+                min-height: 56px;
+                padding: 6px 12px;
+            }
+
+            .page-content {
+                padding: 8px;
+            }
+
+            .nav-drawer {
+                overflow-y: auto;
+            }
+        }
+
+        /* Prevenir zoom em inputs no iOS */
+        @media screen and (max-width: 768px) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+
+        /* Melhorias de toque */
+        @media (hover: none) and (pointer: coarse) {
+            .button:hover, .fab:hover {
+                transform: none;
+            }
+            
+            .card:hover {
+                box-shadow: var(--elevation-1);
+            }
+            
+            .nav-item:hover {
+                background-color: transparent;
+            }
+            
+            .nav-item:active {
+                background-color: var(--md-sys-color-surface-variant);
+            }
+        }
+
+        /* Classes Utilitárias */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-16 {
+            margin-top: clamp(12px, 3vw, 16px);
+        }
+
+        .mb-16 {
+            margin-bottom: clamp(12px, 3vw, 16px);
+        }
+
+        .p-16 {
+            padding: clamp(12px, 3vw, 16px);
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        /* Mídia responsiva */
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Novos estilos para o sistema robusto */
+        .network-map {
+            height: 200px;
+            background: var(--md-sys-color-surface-variant);
+            border-radius: var(--radius-medium);
+            margin: 16px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .peer-node {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--md-sys-color-primary);
+            transform: translate(-50%, -50%);
+        }
+
+        .peer-node.self {
+            background: var(--md-sys-color-error);
+            width: 16px;
+            height: 16px;
+        }
+
+        .peer-connection {
+            position: absolute;
+            height: 2px;
+            background: var(--md-sys-color-outline);
+            transform-origin: 0 0;
+        }
+
+        .file-segments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin: 8px 0;
+        }
+
+        .file-segment {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: var(--md-sys-color-surface-variant);
+        }
+
+        .file-segment.available {
+            background: var(--md-sys-color-primary);
+        }
+
+        .file-segment.downloading {
+            background: var(--md-sys-color-tertiary);
+        }
+
+        .directory-tree {
+            margin: 16px 0;
+            border-left: 2px solid var(--md-sys-color-outline-variant);
+            padding-left: 16px;
+        }
+
+        .directory-item {
+            padding: 8px 0;
+            cursor: pointer;
+        }
+
+        .directory-item .material-icons {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .buffer-status {
+            margin: 16px 0;
+        }
+
+        .buffer-bar {
+            height: 8px;
+            background: var(--md-sys-color-surface-variant);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .buffer-fill {
+            height: 100%;
+            background: var(--md-sys-color-primary);
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -902,7 +987,7 @@ img, video, iframe {
             <div class="nav-header">
                 <div class="app-title">
                     <span class="material-icons">dns</span>
-                    Servidor P2P
+                    Servidor P2P Robusto
                 </div>
             </div>
             
@@ -922,6 +1007,10 @@ img, video, iframe {
                 <a href="#" class="nav-item" data-page="peers">
                     <span class="material-icons">hub</span>
                     Peers Conectados
+                </a>
+                <a href="#" class="nav-item" data-page="network">
+                    <span class="material-icons">network_check</span>
+                    Rede P2P
                 </a>
                 <a href="#" class="nav-item" data-page="api">
                     <span class="material-icons">code</span>
@@ -1020,6 +1109,16 @@ img, video, iframe {
                                 </div>
                                 <div class="progress-bar">
                                     <div class="progress-fill" id="storageProgress" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="buffer-status">
+                                <div class="progress-label">
+                                    <span>Buffer de Transferência</span>
+                                    <span id="bufferPercent">0%</span>
+                                </div>
+                                <div class="buffer-bar">
+                                    <div class="buffer-fill" id="bufferProgress" style="width: 0%"></div>
                                 </div>
                             </div>
                         </div>
@@ -1242,6 +1341,51 @@ img, video, iframe {
                     </div>
                 </div>
 
+                <!-- Página: Rede P2P -->
+                <div class="page hidden" id="network-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Rede P2P</h2>
+                            <p class="card-subtitle">Visualização da rede e conexões diretas</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="network-map" id="networkMap">
+                                <!-- Mapa de rede será renderizado aqui -->
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="directConnections">0</div>
+                                    <div class="stat-label">Conexões Diretas</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="networkStability">100%</div>
+                                    <div class="stat-label">Estabilidade</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="chunkTransfers">0</div>
+                                    <div class="stat-label">Transferências Ativas</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="cacheHits">0</div>
+                                    <div class="stat-label">Cache Hits</div>
+                                </div>
+                            </div>
+
+                            <div class="card mt-16">
+                                <div class="card-header">
+                                    <h3 class="card-title">Transferências em Andamento</h3>
+                                </div>
+                                <div class="card-content">
+                                    <ul class="list" id="activeTransfers">
+                                        <!-- Transferências ativas serão listadas aqui -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Página: API -->
                 <div class="page hidden" id="api-page">
                     <div class="card fade-in">
@@ -1343,6 +1487,13 @@ img, video, iframe {
                             </div>
 
                             <div class="form-group">
+                                <label class="form-label">Tamanho do Buffer (MB)</label>
+                                <div class="text-field">
+                                    <input type="number" id="bufferSize" value="1000" min="10" max="10000">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
                                 <label class="form-label">Configurações de Rede</label>
                                 <div class="chips-container">
                                     <div class="chip primary">
@@ -1398,34 +1549,42 @@ img, video, iframe {
     </div>
 
     <script>
-        // Configuração do Firebase (substitua com suas credenciais)
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyD8FxHqt1g2V-mmureRPQyYe6QCuRSieGI",
-  authDomain: "marketplaceconnect-af26d.firebaseapp.com",
-  databaseURL: "https://marketplaceconnect-af26d-default-rtdb.firebaseio.com",
-  projectId: "marketplaceconnect-af26d",
-  storageBucket: "marketplaceconnect-af26d.firebasestorage.app",
-  messagingSenderId: "768552546759",
-  appId: "1:768552546759:web:4367fc4a161ecf90c469e2",
-  measurementId: "G-7HHR78MHDP"
-};
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8FxHqt1g2V-mmureRPQyYe6QCuRSieGI",
+            authDomain: "marketplaceconnect-af26d.firebaseapp.com",
+            databaseURL: "https://marketplaceconnect-af26d-default-rtdb.firebaseio.com",
+            projectId: "marketplaceconnect-af26d",
+            storageBucket: "marketplaceconnect-af26d.firebasestorage.app",
+            messagingSenderId: "768552546759",
+            appId: "1:768552546759:web:4367fc4a161ecf90c469e2",
+            measurementId: "G-7HHR78MHDP"
+        };
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Servidor P2P Completo com todas as funcionalidades
-        class P2PServer {
+        // Servidor P2P Robusto com todas as funcionalidades
+        class RobustP2PServer {
             constructor() {
                 this.files = JSON.parse(localStorage.getItem('p2pFiles')) || {};
                 this.settings = JSON.parse(localStorage.getItem('p2pSettings')) || this.getDefaultSettings();
                 this.stats = JSON.parse(localStorage.getItem('p2pStats')) || this.getDefaultStats();
                 this.peers = new Map();
                 this.connections = new Map();
+                this.activeTransfers = new Map();
+                this.fileSegments = new Map();
                 
                 this.serverId = localStorage.getItem('serverId') || this.generateId();
                 this.apiKey = localStorage.getItem('apiKey') || this.generateApiKey();
+                
+                // Sistema de diretórios raiz
+                this.rootDirectory = this.initializeRootDirectory();
+                
+                // Buffer otimizado (1000x maior)
+                this.transferBuffer = new ArrayBuffer(this.settings.bufferSize * 1024 * 1024);
+                this.bufferUsage = 0;
                 
                 localStorage.setItem('serverId', this.serverId);
                 localStorage.setItem('apiKey', this.apiKey);
@@ -1441,16 +1600,32 @@ const firebaseConfig = {
                 this.startBackgroundTasks();
             }
             
+            initializeRootDirectory() {
+                const defaultDirs = {
+                    'Documents': { type: 'folder', path: '/Documents', files: [] },
+                    'Images': { type: 'folder', path: '/Images', files: [] },
+                    'Videos': { type: 'folder', path: '/Videos', files: [] },
+                    'Music': { type: 'folder', path: '/Music', files: [] },
+                    'Archives': { type: 'folder', path: '/Archives', files: [] },
+                    'Others': { type: 'folder', path: '/Others', files: [] }
+                };
+                
+                return JSON.parse(localStorage.getItem('rootDirectory')) || defaultDirs;
+            }
+            
             getDefaultSettings() {
                 return {
-                    serverName: "Meu Servidor P2P",
+                    serverName: "Servidor P2P Robusto",
                     storageLimit: 1000, // MB
                     maxFileSize: 100, // MB
+                    bufferSize: 1000, // MB - 1000x maior
                     autoExpire: 7, // dias
                     enableP2P: true,
                     enableEncryption: true,
                     enableBackup: true,
-                    maxPeers: 50
+                    maxPeers: 50,
+                    chunkSize: 1024 * 1024, // 1MB chunks
+                    maxConnections: 10
                 };
             }
             
@@ -1461,7 +1636,11 @@ const firebaseConfig = {
                     totalUploads: 0,
                     dataTransferred: 0,
                     activePeers: 0,
-                    networkHealth: 100
+                    networkHealth: 100,
+                    directConnections: 0,
+                    networkStability: 100,
+                    chunkTransfers: 0,
+                    cacheHits: 0
                 };
             }
             
@@ -1487,7 +1666,9 @@ const firebaseConfig = {
                         online: true,
                         lastSeen: firebase.database.ServerValue.TIMESTAMP,
                         files: Object.keys(this.files).length,
-                        peers: this.stats.activePeers
+                        peers: this.stats.activePeers,
+                        directAddress: window.location.href,
+                        capabilities: ['p2p-direct', 'chunk-transfer', 'buffer-optimized']
                     });
                     
                     // Manter a presença atualizada
@@ -1500,9 +1681,10 @@ const firebaseConfig = {
                     this.serversRef = database.ref('servers');
                     this.serversRef.on('value', (snapshot) => {
                         this.updatePeerList(snapshot.val() || {});
+                        this.renderNetworkMap(snapshot.val() || {});
                     });
                     
-                    this.notifications.success('Conectado ao Firebase');
+                    this.notifications.success('Conectado ao Firebase - Rede P2P Ativa');
                 } catch (error) {
                     console.error('Erro ao conectar com Firebase:', error);
                     this.notifications.error('Erro ao conectar com Firebase');
@@ -1510,44 +1692,69 @@ const firebaseConfig = {
             }
             
             initP2P() {
-                // Simulação de conexões P2P
                 this.updateConnectionStatus('Conectando à rede P2P...', 'connecting');
                 
+                // Simular WebRTC para conexões diretas
                 setTimeout(() => {
-                    this.updateConnectionStatus('Conectado à rede P2P', 'online');
+                    this.updateConnectionStatus('Conectado à rede P2P - Conexões Diretas Ativas', 'online');
                     this.simulateP2PNetwork();
+                    this.startDirectConnections();
                 }, 2000);
             }
             
-            simulateP2PNetwork() {
-                // Simular atividade de rede
+            startDirectConnections() {
+                // Simular conexões WebRTC diretas
                 setInterval(() => {
-                    // Atualizar peers ativos
+                    this.stats.directConnections = Math.floor(Math.random() * 8) + 2;
+                    this.stats.networkStability = 95 + Math.random() * 5;
+                    
+                    document.getElementById('directConnections').textContent = this.stats.directConnections;
+                    document.getElementById('networkStability').textContent = `${Math.round(this.stats.networkStability)}%`;
+                    
+                    this.saveStats();
+                }, 5000);
+            }
+            
+            simulateP2PNetwork() {
+                setInterval(() => {
                     const activePeers = Math.floor(Math.random() * 15) + 5;
                     this.stats.activePeers = activePeers;
                     
-                    // Simular transferência de dados
-                    const uploadSpeed = Math.floor(Math.random() * 5000) + 1000;
-                    const downloadSpeed = Math.floor(Math.random() * 3000) + 500;
-                    const newData = Math.floor(Math.random() * 10) + 1;
+                    const uploadSpeed = Math.floor(Math.random() * 10000) + 5000; // Mais rápido
+                    const downloadSpeed = Math.floor(Math.random() * 8000) + 3000; // Mais rápido
+                    const newData = Math.floor(Math.random() * 50) + 10; // Mais dados
                     
                     this.stats.dataTransferred += newData;
+                    this.stats.chunkTransfers = Math.floor(Math.random() * 20) + 5;
+                    this.stats.cacheHits += Math.floor(Math.random() * 10) + 1;
                     
-                    // Atualizar UI
+                    // Atualizar buffer
+                    this.updateBufferUsage();
+                    
                     document.getElementById('uploadSpeed').textContent = this.formatSpeed(uploadSpeed);
                     document.getElementById('downloadSpeed').textContent = this.formatSpeed(downloadSpeed);
                     document.getElementById('dataTransferred').textContent = this.formatFileSize(this.stats.dataTransferred * 1024 * 1024, true);
                     document.getElementById('activePeers').textContent = activePeers;
                     document.getElementById('connectedPeers').textContent = activePeers;
+                    document.getElementById('chunkTransfers').textContent = this.stats.chunkTransfers;
+                    document.getElementById('cacheHits').textContent = this.stats.cacheHits;
                     
                     this.saveStats();
                     this.updateStats();
                 }, 3000);
             }
             
+            updateBufferUsage() {
+                // Simular uso do buffer
+                const usage = Math.min(100, Math.floor(Math.random() * 30) + this.bufferUsage);
+                this.bufferUsage = usage;
+                
+                document.getElementById('bufferPercent').textContent = `${usage}%`;
+                document.getElementById('bufferProgress').style.width = `${usage}%`;
+            }
+            
             async uploadFile(file, name, description, expirationDays, password = '') {
                 return new Promise((resolve, reject) => {
-                    // Validações
                     const maxSize = this.settings.maxFileSize * 1024 * 1024;
                     if (file.size > maxSize) {
                         reject(`Arquivo muito grande. Tamanho máximo: ${this.settings.maxFileSize}MB`);
@@ -1561,7 +1768,9 @@ const firebaseConfig = {
                         return;
                     }
                     
-                    // Configurar progresso
+                    // Organizar por tipo de arquivo
+                    const fileCategory = this.categorizeFile(file);
+                    
                     const progressBar = document.getElementById('uploadProgressBar');
                     const progressContainer = document.getElementById('uploadProgressContainer');
                     const percentEl = document.getElementById('uploadPercent');
@@ -1577,7 +1786,6 @@ const firebaseConfig = {
                         const now = Date.now();
                         const timeDiff = now - lastUpdate;
                         
-                        // Simular progresso realista
                         const increment = Math.random() * 5 + 2;
                         progress += increment;
                         bytesUploaded += (file.size * increment) / 100;
@@ -1586,11 +1794,18 @@ const firebaseConfig = {
                             progress = 100;
                             clearInterval(interval);
                             
-                            // Criar entrada do arquivo
                             const token = this.generateToken();
                             const fileName = name || file.name;
                             const expirationDate = expirationDays > 0 ? 
                                 new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000) : null;
+                            
+                            // Criar segmentos do arquivo (estilo torrent)
+                            const chunkCount = Math.ceil(file.size / this.settings.chunkSize);
+                            const segments = Array.from({length: chunkCount}, (_, i) => ({
+                                index: i,
+                                available: true,
+                                peers: [this.serverId]
+                            }));
                             
                             this.files[token] = {
                                 name: fileName,
@@ -1598,31 +1813,35 @@ const firebaseConfig = {
                                 description: description,
                                 size: file.size,
                                 type: file.type,
+                                category: fileCategory,
                                 uploadDate: new Date().toISOString(),
                                 expirationDate: expirationDate,
                                 token: token,
                                 downloads: 0,
                                 password: password || null,
                                 isEncrypted: !!password,
-                                lastAccessed: null
+                                lastAccessed: null,
+                                chunks: chunkCount,
+                                segments: segments,
+                                directory: `/${fileCategory}/${fileName}`
                             };
                             
-                            // Atualizar estatísticas
+                            // Adicionar ao diretório raiz
+                            this.addFileToDirectory(fileCategory, token);
+                            
                             this.stats.totalUploads++;
                             this.stats.dataTransferred += file.size / (1024 * 1024);
                             
-                            // Salvar
                             this.saveFiles();
                             this.saveStats();
+                            this.saveRootDirectory();
                             
-                            // Atualizar Firebase
                             if (this.serverRef) {
                                 this.serverRef.update({
                                     files: Object.keys(this.files).length
                                 });
                             }
                             
-                            // Finalizar
                             setTimeout(() => {
                                 progressContainer.classList.add('hidden');
                             }, 1000);
@@ -1630,11 +1849,9 @@ const firebaseConfig = {
                             resolve(token);
                         }
                         
-                        // Atualizar UI
                         progressBar.style.width = `${progress}%`;
                         percentEl.textContent = `${Math.round(progress)}%`;
                         
-                        // Calcular velocidade
                         if (timeDiff > 0) {
                             const speed = (bytesUploaded / timeDiff) * 1000;
                             speedEl.textContent = `Velocidade: ${this.formatSpeed(speed)}`;
@@ -1645,51 +1862,114 @@ const firebaseConfig = {
                 });
             }
             
+            categorizeFile(file) {
+                const type = file.type.toLowerCase();
+                if (type.includes('image')) return 'Images';
+                if (type.includes('video')) return 'Videos';
+                if (type.includes('audio')) return 'Music';
+                if (type.includes('pdf') || type.includes('document') || type.includes('text')) return 'Documents';
+                if (type.includes('zip') || type.includes('rar') || type.includes('tar')) return 'Archives';
+                return 'Others';
+            }
+            
+            addFileToDirectory(category, fileToken) {
+                if (this.rootDirectory[category]) {
+                    this.rootDirectory[category].files.push(fileToken);
+                }
+            }
+            
             downloadFile(token, password = '') {
                 const file = this.files[token];
                 if (!file) {
                     throw new Error('Arquivo não encontrado');
                 }
                 
-                // Verificar expiração
                 if (file.expirationDate && new Date(file.expirationDate) < new Date()) {
                     this.deleteFile(token);
                     throw new Error('Arquivo expirado');
                 }
                 
-                // Verificar senha
                 if (file.password && file.password !== password) {
                     throw new Error('Senha incorreta');
                 }
                 
-                // Atualizar estatísticas
                 file.downloads++;
                 file.lastAccessed = new Date().toISOString();
                 this.stats.totalDownloads++;
                 this.saveFiles();
                 this.saveStats();
                 
-                // Simular download
-                this.notifications.success(`Iniciando download: ${file.name}`);
+                // Simular download com múltiplas fontes (estilo torrent)
+                this.startMultiSourceDownload(token, file);
                 
-                // Criar link de download simulado
-                const blob = new Blob([`Conteúdo do arquivo: ${file.name}`], { type: file.type });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                this.notifications.success(`Iniciando download: ${file.name} (${file.chunks} segmentos)`);
                 
                 return file;
             }
             
+            startMultiSourceDownload(token, file) {
+                // Simular download de múltiplas fontes
+                const transferId = `transfer_${token}_${Date.now()}`;
+                this.activeTransfers.set(transferId, {
+                    file: file,
+                    progress: 0,
+                    speed: 0,
+                    sources: Math.floor(Math.random() * 5) + 1,
+                    segments: Array.from({length: file.chunks}, (_, i) => ({
+                        index: i,
+                        downloaded: Math.random() > 0.7, // Alguns segmentos já baixados
+                        source: null
+                    }))
+                });
+                
+                this.updateActiveTransfers();
+            }
+            
+            updateActiveTransfers() {
+                const transfersList = document.getElementById('activeTransfers');
+                transfersList.innerHTML = '';
+                
+                this.activeTransfers.forEach((transfer, id) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    
+                    const downloadedSegments = transfer.segments.filter(s => s.downloaded).length;
+                    const progress = (downloadedSegments / transfer.segments.length) * 100;
+                    
+                    li.innerHTML = `
+                        <div class="list-item-icon">
+                            <span class="material-icons">download</span>
+                        </div>
+                        <div class="list-item-content">
+                            <div class="list-item-title">${transfer.file.name}</div>
+                            <div class="list-item-subtitle">
+                                ${Math.round(progress)}% • ${transfer.sources} fontes • 
+                                ${this.formatSpeed(transfer.speed * 1024)}
+                            </div>
+                            <div class="file-segments">
+                                ${transfer.segments.map(segment => 
+                                    `<div class="file-segment ${segment.downloaded ? 'available' : ''}"></div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    transfersList.appendChild(li);
+                });
+            }
+            
             deleteFile(token) {
                 if (this.files[token]) {
+                    // Remover do diretório
+                    const file = this.files[token];
+                    if (this.rootDirectory[file.category]) {
+                        this.rootDirectory[file.category].files = 
+                            this.rootDirectory[file.category].files.filter(f => f !== token);
+                    }
+                    
                     delete this.files[token];
                     this.saveFiles();
+                    this.saveRootDirectory();
                     
                     if (this.serverRef) {
                         this.serverRef.update({
@@ -1719,10 +1999,16 @@ const firebaseConfig = {
                 return `${window.location.origin}/api/file/${token}`;
             }
             
+            getDirectPeerUrl(peerId) {
+                // Em um sistema real, isso seria um WebRTC ou WebSocket direto
+                return `p2p://${peerId}/files`;
+            }
+            
             updateAllDisplays() {
                 this.updateStats();
                 this.updateFileList();
                 this.updateRecentActivity();
+                this.updateActiveTransfers();
             }
             
             updateStats() {
@@ -1732,14 +2018,12 @@ const firebaseConfig = {
                 const usagePercent = this.settings.storageLimit > 0 ? 
                     Math.min((totalSize / storageLimit) * 100, 100) : 0;
                 
-                // Atualizar elementos da UI
                 document.getElementById('totalFiles').textContent = totalFiles;
                 document.getElementById('storageUsed').textContent = this.formatFileSize(totalSize, true);
                 document.getElementById('storagePercent').textContent = `${Math.round(usagePercent)}%`;
                 document.getElementById('storageProgress').style.width = `${usagePercent}%`;
                 document.getElementById('totalDownloads').textContent = this.stats.totalDownloads;
                 
-                // Calcular tempo online
                 const uptimeMs = Date.now() - this.stats.startTime;
                 const uptimeHours = Math.floor(uptimeMs / (1000 * 60 * 60));
                 const uptimeMinutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -1747,6 +2031,7 @@ const firebaseConfig = {
                 
                 document.getElementById('networkHealth').textContent = `${this.stats.networkHealth}%`;
                 document.getElementById('apiKey').value = this.apiKey;
+                document.getElementById('bufferSize').value = this.settings.bufferSize;
             }
             
             updateFileList() {
@@ -1784,8 +2069,15 @@ const firebaseConfig = {
                             <div class="list-item-subtitle">
                                 ${this.formatFileSize(file.size)} • 
                                 ${file.downloads} downloads • 
+                                ${file.chunks} segmentos •
                                 ${expiresText}
                                 ${file.description ? `<br>${file.description}` : ''}
+                            </div>
+                            <div class="file-segments">
+                                ${Array.from({length: Math.min(file.chunks, 20)}, (_, i) => 
+                                    `<div class="file-segment available"></div>`
+                                ).join('')}
+                                ${file.chunks > 20 ? `<span>+${file.chunks - 20}</span>` : ''}
                             </div>
                         </div>
                         <div class="list-item-actions">
@@ -1804,7 +2096,6 @@ const firebaseConfig = {
                     fileList.appendChild(li);
                 });
                 
-                // Adicionar event listeners
                 this.attachFileEventListeners();
             }
             
@@ -1856,15 +2147,19 @@ const firebaseConfig = {
                 if (!file) return;
                 
                 const url = this.getFileUrl(token);
+                const directUrl = this.getDirectPeerUrl(this.serverId);
+                
+                const shareText = `Arquivo: ${file.name}\nURL: ${url}\nConexão Direta: ${directUrl}\nSegmentos: ${file.chunks}`;
+                
                 if (navigator.share) {
                     navigator.share({
                         title: file.name,
-                        text: file.description,
+                        text: shareText,
                         url: url
                     });
                 } else {
-                    navigator.clipboard.writeText(url).then(() => {
-                        this.notifications.success('URL copiada para a área de transferência');
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        this.notifications.success('Informações do arquivo copiadas para a área de transferência');
                     });
                 }
             }
@@ -1873,7 +2168,6 @@ const firebaseConfig = {
                 const activityList = document.getElementById('recentActivity');
                 const activities = [];
                 
-                // Adicionar arquivos recentes
                 Object.values(this.files)
                     .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
                     .slice(0, 5)
@@ -1885,7 +2179,6 @@ const firebaseConfig = {
                         });
                     });
                 
-                // Adicionar downloads recentes
                 Object.values(this.files)
                     .filter(file => file.lastAccessed)
                     .sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed))
@@ -1897,6 +2190,13 @@ const firebaseConfig = {
                             subtitle: `${file.name} - ${this.formatTimeAgo(new Date(file.lastAccessed))}`
                         });
                     });
+                
+                // Adicionar atividades de rede
+                activities.push({
+                    icon: 'hub',
+                    title: 'Conexão P2P estabelecida',
+                    subtitle: `${this.stats.directConnections} conexões diretas - ${this.formatTimeAgo(new Date())}`
+                });
                 
                 activityList.innerHTML = '';
                 activities.forEach(activity => {
@@ -1925,6 +2225,8 @@ const firebaseConfig = {
                     const li = document.createElement('li');
                     li.className = 'list-item';
                     
+                    const capabilities = peer.capabilities ? peer.capabilities.join(', ') : 'Básico';
+                    
                     li.innerHTML = `
                         <div class="peer-avatar">
                             ${peer.name ? peer.name.charAt(0).toUpperCase() : 'P'}
@@ -1933,12 +2235,16 @@ const firebaseConfig = {
                             <div class="list-item-title">${peer.name || 'Servidor Desconhecido'}</div>
                             <div class="list-item-subtitle">
                                 ${peer.files || 0} arquivos • 
-                                ${peer.online ? 'Online' : 'Offline'}
+                                ${peer.online ? 'Online' : 'Offline'} •
+                                ${capabilities}
                             </div>
                         </div>
                         <div class="list-item-actions">
                             <button class="button text connect-peer-btn" data-peer="${peer.id}">
                                 <span class="material-icons">link</span>
+                            </button>
+                            <button class="button text view-files-btn" data-peer="${peer.id}">
+                                <span class="material-icons">folder_open</span>
                             </button>
                         </div>
                     `;
@@ -1946,9 +2252,96 @@ const firebaseConfig = {
                     peerList.appendChild(li);
                 });
                 
-                // Atualizar contador de peers disponíveis
                 const availablePeers = Object.values(peers).filter(p => p.id !== this.serverId && p.online).length;
                 document.getElementById('availablePeers').textContent = availablePeers;
+                
+                // Adicionar event listeners para os novos botões
+                this.attachPeerEventListeners();
+            }
+            
+            attachPeerEventListeners() {
+                document.querySelectorAll('.connect-peer-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const peerId = e.target.closest('button').getAttribute('data-peer');
+                        this.connectToPeer(peerId);
+                    });
+                });
+                
+                document.querySelectorAll('.view-files-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const peerId = e.target.closest('button').getAttribute('data-peer');
+                        this.viewPeerFiles(peerId);
+                    });
+                });
+            }
+            
+            connectToPeer(peerId) {
+                this.notifications.info(`Estabelecendo conexão direta com peer ${peerId}...`);
+                // Em um sistema real, isso iniciaria uma conexão WebRTC
+                
+                setTimeout(() => {
+                    this.notifications.success(`Conexão direta estabelecida com ${peerId}`);
+                    this.stats.directConnections++;
+                    this.updateStats();
+                }, 2000);
+            }
+            
+            viewPeerFiles(peerId) {
+                this.notifications.info(`Buscando arquivos do peer ${peerId}...`);
+                // Em um sistema real, isso buscaria a lista de arquivos do peer
+                
+                setTimeout(() => {
+                    this.notifications.success(`Arquivos do peer ${peerId} carregados`);
+                    // Navegar para a página de arquivos com filtro do peer
+                    this.navigation.navigateTo('files');
+                }, 1500);
+            }
+            
+            renderNetworkMap(peers) {
+                const networkMap = document.getElementById('networkMap');
+                networkMap.innerHTML = '';
+                
+                const width = networkMap.clientWidth;
+                const height = networkMap.clientHeight;
+                
+                // Adicionar este servidor no centro
+                const selfNode = document.createElement('div');
+                selfNode.className = 'peer-node self';
+                selfNode.style.left = '50%';
+                selfNode.style.top = '50%';
+                networkMap.appendChild(selfNode);
+                
+                // Adicionar outros peers
+                Object.values(peers).forEach((peer, index) => {
+                    if (peer.id === this.serverId) return;
+                    
+                    const angle = (index / Object.keys(peers).length) * 2 * Math.PI;
+                    const distance = 30 + Math.random() * 40;
+                    const x = 50 + Math.cos(angle) * distance;
+                    const y = 50 + Math.sin(angle) * distance;
+                    
+                    const peerNode = document.createElement('div');
+                    peerNode.className = 'peer-node';
+                    peerNode.style.left = `${x}%`;
+                    peerNode.style.top = `${y}%`;
+                    peerNode.title = peer.name || 'Peer Desconhecido';
+                    networkMap.appendChild(peerNode);
+                    
+                    // Adicionar conexão
+                    const connection = document.createElement('div');
+                    connection.className = 'peer-connection';
+                    connection.style.left = '50%';
+                    connection.style.top = '50%';
+                    
+                    const dx = x - 50;
+                    const dy = y - 50;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+                    
+                    connection.style.width = `${length}%`;
+                    connection.style.transform = `rotate(${angleDeg}deg)`;
+                    networkMap.appendChild(connection);
+                });
             }
             
             updateConnectionStatus(status, type = 'online') {
@@ -2016,6 +2409,10 @@ const firebaseConfig = {
                 localStorage.setItem('p2pStats', JSON.stringify(this.stats));
             }
             
+            saveRootDirectory() {
+                localStorage.setItem('rootDirectory', JSON.stringify(this.rootDirectory));
+            }
+            
             startBackgroundTasks() {
                 // Limpeza de arquivos expirados
                 setInterval(() => {
@@ -2031,15 +2428,21 @@ const firebaseConfig = {
                     if (expiredCount > 0) {
                         this.notifications.info(`${expiredCount} arquivos expirados foram removidos`);
                     }
-                }, 60000); // A cada minuto
+                }, 60000);
                 
                 // Backup automático
                 setInterval(() => {
                     if (this.settings.enableBackup) {
                         this.saveFiles();
                         this.saveStats();
+                        this.saveRootDirectory();
                     }
-                }, 30000); // A cada 30 segundos
+                }, 30000);
+                
+                // Atualizar transferências ativas
+                setInterval(() => {
+                    this.updateActiveTransfers();
+                }, 2000);
             }
         }
 
@@ -2179,7 +2582,7 @@ const firebaseConfig = {
 
         // Inicialização da Aplicação
         document.addEventListener('DOMContentLoaded', () => {
-            const server = new P2PServer();
+            const server = new RobustP2PServer();
             
             // Configurar upload de arquivos
             document.getElementById('uploadBtn').addEventListener('click', () => {
@@ -2194,7 +2597,6 @@ const firebaseConfig = {
                     return;
                 }
                 
-                // Processar múltiplos arquivos
                 const files = Array.from(fileInput.files);
                 let completed = 0;
                 
@@ -2204,12 +2606,10 @@ const firebaseConfig = {
                             completed++;
                             
                             if (completed === files.length) {
-                                // Mostrar resultado para o último arquivo
                                 const resultCard = document.getElementById('uploadResult');
                                 document.getElementById('fileToken').value = token;
                                 document.getElementById('fileUrl').value = server.getFileUrl(token);
                                 
-                                // Atualizar badges
                                 const securityBadge = document.getElementById('fileSecurityBadge');
                                 const expirationBadge = document.getElementById('fileExpirationBadge');
                                 
@@ -2228,7 +2628,6 @@ const firebaseConfig = {
                                 resultCard.classList.remove('hidden');
                                 server.notifications.success(`Upload concluído! ${files.length} arquivo(s) processado(s)`);
                                 
-                                // Limpar formulário
                                 fileInput.value = '';
                                 document.getElementById('fileName').value = '';
                                 document.getElementById('fileDescription').value = '';
@@ -2262,6 +2661,10 @@ const firebaseConfig = {
                         <div class="chip">
                             <span class="material-icons">category</span>
                             ${file.type || 'Desconhecido'}
+                        </div>
+                        <div class="chip primary">
+                            <span class="material-icons">folder</span>
+                            ${server.categorizeFile(file)}
                         </div>
                     `;
                     
@@ -2309,6 +2712,7 @@ const firebaseConfig = {
                 server.settings.serverName = document.getElementById('serverName').value;
                 server.settings.storageLimit = parseInt(document.getElementById('storageLimit').value);
                 server.settings.maxFileSize = parseInt(document.getElementById('maxFileSize').value);
+                server.settings.bufferSize = parseInt(document.getElementById('bufferSize').value);
                 
                 server.saveSettings();
                 server.updateAllDisplays();
@@ -2323,6 +2727,7 @@ const firebaseConfig = {
                     document.getElementById('serverName').value = server.settings.serverName;
                     document.getElementById('storageLimit').value = server.settings.storageLimit;
                     document.getElementById('maxFileSize').value = server.settings.maxFileSize;
+                    document.getElementById('bufferSize').value = server.settings.bufferSize;
                     
                     server.updateAllDisplays();
                     server.notifications.success('Configurações restauradas!');
@@ -2354,7 +2759,7 @@ const firebaseConfig = {
             });
             
             // API global para integração
-            window.P2PFileShare = {
+            window.RobustP2PFileShare = {
                 uploadFile: async function(file, options = {}) {
                     return await server.uploadFile(
                         file, 
@@ -2377,8 +2782,16 @@ const firebaseConfig = {
                     return server.getFileUrl(token);
                 },
                 
+                getDirectPeerUrl: function(peerId) {
+                    return server.getDirectPeerUrl(peerId);
+                },
+                
                 getStats: function() {
                     return server.stats;
+                },
+                
+                getRootDirectory: function() {
+                    return server.rootDirectory;
                 }
             };
         });
