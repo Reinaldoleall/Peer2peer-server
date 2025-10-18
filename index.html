@@ -627,10 +627,15 @@
             </div>
             
             <div class="nav-items">
+              
                 <a href="#" class="nav-item active" data-page="dashboard">
                     <span class="material-icons">dashboard</span>
                     Dashboard
                 </a>
+                <a href="#" class="nav-item" data-page="paired">
+    <span class="material-icons">group</span>
+    Usuários Pareados
+</a>
                 <a href="#" class="nav-item" data-page="upload">
                     <span class="material-icons">cloud_upload</span>
                     Upload de Arquivos
@@ -663,6 +668,7 @@
                     <span id="statusText">Conectando...</span>
                 </div>
             </div>
+            
         </nav>
 
         <main class="main-content" id="mainContent">
@@ -912,6 +918,73 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Adicionar no nav -->
+
+
+<!-- Nova página -->
+<div class="page hidden" id="paired-page">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Usuários Pareados</h2>
+            <p class="card-subtitle">Gerencie conexões diretas e compartilhamentos</p>
+        </div>
+        <div class="card-content">
+            <!-- Token de Pareamento -->
+            <div class="form-group">
+                <label class="form-label">Conectar via Token</label>
+                <div class="text-field">
+                    <input type="text" id="pairingTokenInput" placeholder="Cole o token de pareamento">
+                    <button class="button primary" id="connectViaTokenBtn">
+                        <span class="material-icons">link</span>
+                        Conectar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Gerar Token -->
+            <div class="form-group">
+                <label class="form-label">Seu Token de Pareamento</label>
+                <div class="text-field">
+                    <input type="text" id="myPairingToken" readonly value="Carregando...">
+                    <span class="material-icons" id="copyPairingToken">content_copy</span>
+                </div>
+                <button class="button outlined" id="generateTokenBtn">
+                    <span class="material-icons">autorenew</span>
+                    Gerar Novo Token
+                </button>
+            </div>
+            
+            <!-- Abas -->
+            <div class="tabs">
+                <button class="tab active" data-tab="paired">Pareados</button>
+                <button class="tab" data-tab="pending">Solicitações</button>
+                <button class="tab" data-tab="available">Disponíveis</button>
+            </div>
+            
+            <!-- Lista de Pareados -->
+            <div class="tab-content active" id="tab-paired">
+                <ul class="list" id="pairedUsersList">
+                    <!-- Lista de usuários pareados -->
+                </ul>
+            </div>
+            
+            <!-- Solicitações Pendentes -->
+            <div class="tab-content" id="tab-pending">
+                <ul class="list" id="pendingRequestsList">
+                    <!-- Solicitações de pareamento -->
+                </ul>
+            </div>
+            
+            <!-- Usuários Disponíveis -->
+            <div class="tab-content" id="tab-available">
+                <ul class="list" id="availableUsersList">
+                    <!-- Usuários disponíveis para pareamento -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Rede -->
                 <div class="page hidden" id="network-page">
@@ -1221,6 +1294,9 @@
             constructor() {
                 this.files = new Map();
                 this.peers = new Map();
+                // No constructor do CompleteP2PServer, após this.initDatabase()
+this.pairingSystem = new PairingSystem(this);
+this.folderSystem = new SharedFolderSystem(this, this.pairingSystem);
                 this.rtcConnections = new Map();
                 this.dataChannels = new Map();
                 this.activeTransfers = new Map();
@@ -1500,25 +1576,64 @@
             }
             
             // ========== TRANSFERÊNCIA DE CHUNKS ==========
-            handlePeerMessage(peerId, message) {
-                switch (message.type) {
-                    case 'request-chunk':
-                        this.handleChunkRequest(peerId, message);
-                        break;
-                    case 'chunk-response':
-                        this.handleChunkResponse(peerId, message);
-                        break;
-                    case 'file-list-request':
-                        this.handleFileListRequest(peerId);
-                        break;
-                    case 'ping':
-                        this.sendToPeer(peerId, { type: 'pong' });
-                        break;
-                    case 'download-request':
-                        this.handleDownloadRequest(peerId, message);
-                        break;
-                }
-            }
+handlePeerMessage(peerId, message) {
+    switch (message.type) {
+        case 'request-chunk':
+            this.handleChunkRequest(peerId, message);
+            break;
+        case 'chunk-response':
+            this.handleChunkResponse(peerId, message);
+            break;
+        case 'file-list-request':
+            this.handleFileListRequest(peerId);
+            break;
+        case 'ping':
+            this.sendToPeer(peerId, { type: 'pong' });
+            break;
+        case 'download-request':
+            this.handleDownloadRequest(peerId, message);
+            break;
+        // ========== NOVOS HANDLERS ==========
+        case 'pairing-request':
+            this.pairingSystem.handlePairingRequest(peerId, message);
+            break;
+        case 'pairing-accepted':
+            this.pairingSystem.handlePairingAccepted(peerId, message);
+            break;
+        case 'pairing-rejected':
+            this.pairingSystem.handlePairingRejected(peerId, message);
+            break;
+        case 'file-share':
+            this.handleFileShare(peerId, message);
+            break;
+        case 'folder-share':
+            this.folderSystem.handleFolderShare(peerId, message);
+            break;
+    }
+}
+
+// ========== HANDLER PARA COMPARTILHAMENTO DE ARQUIVOS ==========
+async handleFileShare(peerId, message) {
+    console.log('Recebendo arquivo compartilhado de:', peerId);
+    
+    const { file, folderId } = message;
+    
+    try {
+        // Salvar arquivo localmente
+        await this.saveFileToDB(file);
+        this.showNotification(`Arquivo "${file.name}" recebido de ${peerId}`, 'success');
+        
+        // Se veio com pasta, adicionar à pasta
+        if (folderId && this.folderSystem) {
+            this.folderSystem.addFileToFolder(file.token, folderId);
+        }
+        
+        this.updateAllDisplays();
+    } catch (error) {
+        console.error('Erro ao salvar arquivo compartilhado:', error);
+        this.showNotification('Erro ao receber arquivo compartilhado', 'error');
+    }
+}
             
             async handleChunkRequest(peerId, message) {
                 const { fileToken, chunkIndex } = message;
@@ -2541,6 +2656,1205 @@
                 }, 5000);
             }
         }
+        
+        // ========== SISTEMA DE PAREAMENTO ==========
+// ========== SISTEMA DE PAREAMENTO ==========
+class PairingSystem {
+    constructor(server) {
+        this.server = server;
+        this.pairedUsers = new Map();
+        this.sharedFolders = new Map();
+        this.pendingConnections = new Map();
+        this.init();
+    }
+    
+    init() {
+        // Carregar pares salvos
+        this.loadPairedUsers();
+        this.loadSharedFolders();
+        
+        // Escutar por mensagens de pareamento
+        this.setupPairingListeners();
+    }
+    
+    // Gerar token de pareamento
+    generatePairingToken() {
+        return 'pair_' + Math.random().toString(36).substr(2, 12);
+    }
+    
+    // Criar solicitação de pareamento
+    createPairingRequest(targetServerId, folderName = 'Compartilhado') {
+        // Verificar se já está pareado
+        if (this.pairedUsers.has(targetServerId)) {
+            this.server.showNotification('Já pareado com este usuário', 'info');
+            return null;
+        }
+        
+        // Verificar se já existe uma solicitação pendente
+        for (const [token, pending] of this.pendingConnections) {
+            if (pending.target === targetServerId && pending.status === 'pending') {
+                this.server.showNotification('Solicitação já enviada para este usuário', 'info');
+                return token;
+            }
+        }
+        
+        const token = this.generatePairingToken();
+        const request = {
+            type: 'pairing-request',
+            from: this.server.serverId,
+            fromName: this.server.settings.serverName,
+            token: token,
+            folderName: folderName,
+            timestamp: Date.now(),
+            capabilities: this.server.getCapabilities()
+        };
+        
+        this.pendingConnections.set(token, {
+            target: targetServerId,
+            status: 'pending',
+            folderName: folderName,
+            sentAt: new Date().toISOString()
+        });
+        
+        // Enviar solicitação
+        const sent = this.server.sendToPeer(targetServerId, request);
+        
+        if (!sent) {
+            this.server.showNotification('Erro ao enviar solicitação - usuário não conectado', 'error');
+            this.pendingConnections.delete(token);
+            return null;
+        }
+        
+        this.server.showNotification(`Solicitação de pareamento enviada para ${targetServerId}`, 'info');
+        
+        // Expirar após 5 minutos
+        setTimeout(() => {
+            if (this.pendingConnections.has(token)) {
+                this.pendingConnections.delete(token);
+                this.server.showNotification('Solicitação de pareamento expirada', 'info');
+                
+                // Atualizar UI se necessário
+                if (typeof updatePendingRequestsList === 'function') {
+                    updatePendingRequestsList(this.server, this);
+                }
+            }
+        }, 300000);
+        
+        return token;
+    }
+    
+    // Aceitar pareamento
+    acceptPairing(token) {
+        const pending = this.pendingConnections.get(token);
+        if (!pending) {
+            this.server.showNotification('Solicitação de pareamento não encontrada', 'error');
+            return false;
+        }
+        
+        if (pending.status !== 'received') {
+            this.server.showNotification('Solicitação de pareamento inválida', 'error');
+            return false;
+        }
+        
+        // Verificar se já está pareado
+        if (this.pairedUsers.has(pending.target)) {
+            this.server.showNotification('Já pareado com este usuário', 'info');
+            this.pendingConnections.delete(token);
+            return false;
+        }
+        
+        const pairedUser = {
+            id: pending.target,
+            name: pending.peerName || pending.target,
+            pairedAt: new Date().toISOString(),
+            folderName: pending.folderName,
+            sharedFiles: new Set(),
+            lastSeen: new Date().toISOString(),
+            connectionStatus: 'connected'
+        };
+        
+        this.pairedUsers.set(pending.target, pairedUser);
+        
+        // Criar pasta compartilhada
+        this.createSharedFolder(pending.target, pending.folderName);
+        
+        // Enviar confirmação
+        const confirmationSent = this.server.sendToPeer(pending.target, {
+            type: 'pairing-accepted',
+            token: token,
+            from: this.server.serverId,
+            fromName: this.server.settings.serverName,
+            timestamp: Date.now()
+        });
+        
+        if (!confirmationSent) {
+            this.server.showNotification('Erro ao confirmar pareamento - usuário desconectado', 'error');
+            this.pairedUsers.delete(pending.target);
+            return false;
+        }
+        
+        this.pendingConnections.delete(token);
+        this.savePairedUsers();
+        
+        this.server.showNotification(`Pareamento estabelecido com ${pending.target}`, 'success');
+        
+        // Atualizar UI
+        if (typeof updatePairingUI === 'function') {
+            updatePairingUI(this.server, this);
+        }
+        
+        return true;
+    }
+    
+    // Recusar pareamento
+    rejectPairing(token) {
+        const pending = this.pendingConnections.get(token);
+        if (!pending) return false;
+        
+        const rejectionSent = this.server.sendToPeer(pending.target, {
+            type: 'pairing-rejected',
+            token: token,
+            from: this.server.serverId
+        });
+        
+        this.pendingConnections.delete(token);
+        
+        if (rejectionSent) {
+            this.server.showNotification('Solicitação de pareamento rejeitada', 'info');
+        }
+        
+        // Atualizar UI
+        if (typeof updatePendingRequestsList === 'function') {
+            updatePendingRequestsList(this.server, this);
+        }
+        
+        return true;
+    }
+    
+    // Desparear usuário
+    unpairUser(userId) {
+        const user = this.pairedUsers.get(userId);
+        if (!user) return false;
+        
+        // Enviar notificação de despareamento (se conectado)
+        if (this.server.dataChannels.has(userId)) {
+            this.server.sendToPeer(userId, {
+                type: 'unpair-notification',
+                from: this.server.serverId
+            });
+        }
+        
+        this.pairedUsers.delete(userId);
+        this.sharedFolders.delete(userId);
+        this.savePairedUsers();
+        this.saveSharedFolders();
+        
+        this.server.showNotification(`Despareado de ${user.name}`, 'success');
+        
+        // Atualizar UI
+        if (typeof updatePairedUsersList === 'function') {
+            updatePairedUsersList(this.server, this);
+        }
+        
+        return true;
+    }
+    
+    // Conectar via token (método principal)
+    connectViaToken(token) {
+        // Verificar se é um token de pareamento pendente
+        if (this.pendingConnections.has(token)) {
+            return this.acceptPairing(token);
+        }
+        
+        // Verificar se é um serverId (conexão direta)
+        if (token.startsWith('server_')) {
+            // Tentar conectar primeiro
+            this.server.connectToPeer(token);
+            
+            // Depois enviar solicitação de pareamento
+            setTimeout(() => {
+                if (this.server.dataChannels.has(token) && 
+                    this.server.dataChannels.get(token).readyState === 'open') {
+                    
+                    this.createPairingRequest(token, 'Compartilhado');
+                }
+            }, 2000);
+            
+            return true;
+        }
+        
+        this.server.showNotification('Token inválido', 'error');
+        return false;
+    }
+    
+    // Criar pasta compartilhada
+    createSharedFolder(peerId, folderName) {
+        if (!this.sharedFolders.has(peerId)) {
+            this.sharedFolders.set(peerId, new Map());
+        }
+        
+        const peerFolders = this.sharedFolders.get(peerId);
+        const folderId = 'shared_folder_' + Date.now();
+        
+        const folder = {
+            id: folderId,
+            name: folderName,
+            peerId: peerId,
+            created: new Date().toISOString(),
+            files: new Map(),
+            totalSize: 0,
+            lastUpdate: new Date().toISOString()
+        };
+        
+        peerFolders.set(folderId, folder);
+        this.saveSharedFolders();
+        
+        return folderId;
+    }
+    
+    // Compartilhar arquivo com par
+    shareFileWithPeer(fileToken, peerId, folderId = null) {
+        const file = this.server.files.get(fileToken);
+        if (!file) {
+            console.error('Arquivo não encontrado:', fileToken);
+            return false;
+        }
+        
+        const peer = this.pairedUsers.get(peerId);
+        if (!peer) {
+            console.error('Usuário não pareado:', peerId);
+            return false;
+        }
+        
+        // Verificar se está conectado
+        if (!this.server.dataChannels.has(peerId) || 
+            this.server.dataChannels.get(peerId).readyState !== 'open') {
+            console.error('Usuário não conectado:', peerId);
+            return false;
+        }
+        
+        // Preparar arquivo para envio (sem dados binários)
+        const fileForSharing = {
+            token: file.token,
+            name: file.name,
+            originalName: file.originalName,
+            description: file.description,
+            size: file.size,
+            type: file.type,
+            uploadDate: file.uploadDate,
+            expirationDate: file.expirationDate,
+            downloads: file.downloads,
+            password: file.password,
+            isEncrypted: file.isEncrypted,
+            lastAccessed: file.lastAccessed,
+            totalChunks: file.totalChunks,
+            chunkSize: file.chunkSize
+        };
+        
+        // Enviar arquivo para o peer
+        const sent = this.server.sendToPeer(peerId, {
+            type: 'file-share',
+            file: fileForSharing,
+            from: this.server.serverId,
+            fromName: this.server.settings.serverName,
+            folderId: folderId,
+            timestamp: Date.now()
+        });
+        
+        if (sent) {
+            peer.sharedFiles.add(fileToken);
+            peer.lastSeen = new Date().toISOString();
+            this.savePairedUsers();
+            
+            // Adicionar à pasta compartilhada se especificado
+            if (folderId && this.sharedFolders.has(peerId)) {
+                const peerFolders = this.sharedFolders.get(peerId);
+                const folder = peerFolders.get(folderId);
+                if (folder) {
+                    folder.files.set(fileToken, {
+                        ...fileForSharing,
+                        sharedAt: new Date().toISOString()
+                    });
+                    folder.totalSize += file.size || 0;
+                    folder.lastUpdate = new Date().toISOString();
+                    this.saveSharedFolders();
+                }
+            }
+            
+            this.server.showNotification(`Arquivo "${file.name}" compartilhado com ${peer.name}`, 'success');
+            return true;
+        } else {
+            this.server.showNotification(`Erro ao compartilhar arquivo com ${peer.name}`, 'error');
+            return false;
+        }
+    }
+    
+    // Compartilhar múltiplos arquivos
+    shareMultipleFiles(fileTokens, peerId, folderId = null) {
+        let successCount = 0;
+        
+        fileTokens.forEach(fileToken => {
+            if (this.shareFileWithPeer(fileToken, peerId, folderId)) {
+                successCount++;
+            }
+        });
+        
+        if (successCount > 0) {
+            this.server.showNotification(`${successCount} arquivos compartilhados com sucesso`, 'success');
+        }
+        
+        return successCount;
+    }
+    
+    // Configurar listeners de pareamento
+    setupPairingListeners() {
+        // Já integrado com handlePeerMessage do servidor principal
+    }
+    
+    // ========== HANDLERS PARA MENSAGENS ==========
+    handlePairingRequest(peerId, message) {
+        console.log('Recebida solicitação de pareamento de:', peerId, message);
+        
+        const request = {
+            peerId: peerId,
+            peerName: message.fromName,
+            token: message.token,
+            folderName: message.folderName,
+            timestamp: message.timestamp,
+            capabilities: message.capabilities
+        };
+        
+        this.pendingConnections.set(message.token, {
+            target: peerId,
+            status: 'received',
+            folderName: message.folderName,
+            peerName: message.fromName,
+            receivedAt: new Date().toISOString(),
+            capabilities: message.capabilities
+        });
+        
+        this.server.showNotification(`Solicitação de pareamento de ${message.fromName}`, 'info');
+        
+        // Atualizar UI se estiver na página de pareamento
+        if (typeof updatePendingRequestsList === 'function') {
+            updatePendingRequestsList(this.server, this);
+        }
+    }
+    
+    handlePairingAccepted(peerId, message) {
+        console.log('Pareamento aceito por:', peerId, message);
+        
+        // Remover da lista de pendentes
+        for (const [token, pending] of this.pendingConnections) {
+            if (pending.target === peerId && pending.status === 'pending') {
+                this.pendingConnections.delete(token);
+                break;
+            }
+        }
+        
+        const pairedUser = {
+            id: peerId,
+            name: message.fromName,
+            pairedAt: new Date().toISOString(),
+            folderName: 'Compartilhado com ' + message.fromName,
+            sharedFiles: new Set(),
+            lastSeen: new Date().toISOString(),
+            connectionStatus: 'connected'
+        };
+        
+        this.pairedUsers.set(peerId, pairedUser);
+        this.createSharedFolder(peerId, pairedUser.folderName);
+        this.savePairedUsers();
+        
+        this.server.showNotification(`Pareamento estabelecido com ${message.fromName}`, 'success');
+        
+        // Atualizar UI
+        if (typeof updatePairingUI === 'function') {
+            updatePairingUI(this.server, this);
+        }
+    }
+    
+    handlePairingRejected(peerId, message) {
+        console.log('Pareamento rejeitado por:', peerId);
+        
+        // Remover da lista de pendentes
+        for (const [token, pending] of this.pendingConnections) {
+            if (pending.target === peerId && pending.status === 'pending') {
+                this.pendingConnections.delete(token);
+                break;
+            }
+        }
+        
+        this.server.showNotification('Solicitação de pareamento rejeitada', 'info');
+        
+        // Atualizar UI
+        if (typeof updatePendingRequestsList === 'function') {
+            updatePendingRequestsList(this.server, this);
+        }
+    }
+    
+    handleUnpairNotification(peerId, message) {
+        console.log('Recebida notificação de despareamento de:', peerId);
+        
+        if (this.pairedUsers.has(peerId)) {
+            const user = this.pairedUsers.get(peerId);
+            this.pairedUsers.delete(peerId);
+            this.sharedFolders.delete(peerId);
+            this.savePairedUsers();
+            this.saveSharedFolders();
+            
+            this.server.showNotification(`${user.name} encerrou o pareamento`, 'info');
+            
+            // Atualizar UI
+            if (typeof updatePairedUsersList === 'function') {
+                updatePairedUsersList(this.server, this);
+            }
+        }
+    }
+    
+    // ========== MÉTODOS UTILITÁRIOS ==========
+    getPairedUserStats() {
+        const stats = {
+            total: this.pairedUsers.size,
+            connected: 0,
+            totalSharedFiles: 0,
+            totalSharedSize: 0
+        };
+        
+        this.pairedUsers.forEach(user => {
+            if (this.server.dataChannels.has(user.id) && 
+                this.server.dataChannels.get(user.id).readyState === 'open') {
+                stats.connected++;
+                user.connectionStatus = 'connected';
+            } else {
+                user.connectionStatus = 'disconnected';
+            }
+            
+            stats.totalSharedFiles += user.sharedFiles.size;
+        });
+        
+        return stats;
+    }
+    
+    updateConnectionStatuses() {
+        this.pairedUsers.forEach((user, userId) => {
+            if (this.server.dataChannels.has(userId) && 
+                this.server.dataChannels.get(userId).readyState === 'open') {
+                user.connectionStatus = 'connected';
+                user.lastSeen = new Date().toISOString();
+            } else {
+                user.connectionStatus = 'disconnected';
+            }
+        });
+        this.savePairedUsers();
+    }
+    
+    // Carregar pares do localStorage
+    loadPairedUsers() {
+        try {
+            const saved = localStorage.getItem('pairedUsers');
+            if (saved) {
+                const pairs = JSON.parse(saved);
+                pairs.forEach(pair => {
+                    this.pairedUsers.set(pair.id, {
+                        ...pair,
+                        sharedFiles: new Set(pair.sharedFiles || [])
+                    });
+                });
+                console.log(`Carregados ${this.pairedUsers.size} usuários pareados`);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar usuários pareados:', error);
+        }
+    }
+    
+    savePairedUsers() {
+        try {
+            const pairs = Array.from(this.pairedUsers.entries()).map(([id, data]) => ({
+                id: id,
+                name: data.name,
+                pairedAt: data.pairedAt,
+                folderName: data.folderName,
+                sharedFiles: Array.from(data.sharedFiles || []),
+                lastSeen: data.lastSeen,
+                connectionStatus: data.connectionStatus
+            }));
+            
+            localStorage.setItem('pairedUsers', JSON.stringify(pairs));
+        } catch (error) {
+            console.error('Erro ao salvar usuários pareados:', error);
+        }
+    }
+    
+    loadSharedFolders() {
+        try {
+            const saved = localStorage.getItem('sharedFolders');
+            if (saved) {
+                const foldersData = JSON.parse(saved);
+                this.sharedFolders = new Map();
+                
+                Object.entries(foldersData).forEach(([peerId, peerFoldersData]) => {
+                    const peerFolders = new Map();
+                    Object.entries(peerFoldersData).forEach(([folderId, folderData]) => {
+                        peerFolders.set(folderId, {
+                            ...folderData,
+                            files: new Map(Object.entries(folderData.files || {}))
+                        });
+                    });
+                    this.sharedFolders.set(peerId, peerFolders);
+                });
+            }
+        } catch (error) {
+            console.error('Erro ao carregar pastas compartilhadas:', error);
+        }
+    }
+    
+    saveSharedFolders() {
+        try {
+            const foldersData = {};
+            this.sharedFolders.forEach((peerFolders, peerId) => {
+                foldersData[peerId] = Object.fromEntries(peerFolders);
+            });
+            localStorage.setItem('sharedFolders', JSON.stringify(foldersData));
+        } catch (error) {
+            console.error('Erro ao salvar pastas compartilhadas:', error);
+        }
+    }
+}
+
+// ========== SISTEMA DE PASTAS COMPARTILHADAS ==========
+// ========== SISTEMA DE PASTAS COMPARTILHADAS ==========
+class SharedFolderSystem {
+    constructor(server, pairingSystem) {
+        this.server = server;
+        this.pairing = pairingSystem;
+        this.folders = new Map(); // folderId -> Folder
+        this.init();
+    }
+    
+    init() {
+        this.loadFolders();
+    }
+    
+    // Criar pasta
+    createFolder(name, parentId = null) {
+        const folderId = 'folder_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const folder = {
+            id: folderId,
+            name: name,
+            parentId: parentId,
+            created: new Date().toISOString(),
+            files: new Map(),
+            subfolders: new Set(),
+            sharedWith: new Set(), // peerIds
+            isShared: false,
+            owner: this.server.serverId
+        };
+        
+        this.folders.set(folderId, folder);
+        this.saveFolders();
+        
+        this.server.showNotification(`Pasta "${name}" criada com sucesso`, 'success');
+        return folderId;
+    }
+    
+    // Compartilhar pasta
+    shareFolder(folderId, peerId) {
+        const folder = this.folders.get(folderId);
+        if (!folder) {
+            this.server.showNotification('Pasta não encontrada', 'error');
+            return false;
+        }
+        
+        // Verificar se o peer existe e está conectado
+        if (!this.server.peers.has(peerId) && !this.pairing.pairedUsers.has(peerId)) {
+            this.server.showNotification('Usuário não encontrado ou não pareado', 'error');
+            return false;
+        }
+        
+        folder.sharedWith.add(peerId);
+        folder.isShared = true;
+        
+        // Preparar dados da pasta para envio (remover dados binários)
+        const folderForSharing = {
+            id: folder.id,
+            name: folder.name,
+            parentId: folder.parentId,
+            created: folder.created,
+            files: new Map(), // Só enviamos metadados, não os arquivos em si
+            subfolders: Array.from(folder.subfolders),
+            sharedWith: Array.from(folder.sharedWith),
+            isShared: folder.isShared,
+            owner: folder.owner
+        };
+        
+        // Converter Map de files para objeto simples
+        folder.files.forEach((file, fileToken) => {
+            folderForSharing.files.set(fileToken, {
+                token: file.token,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                addedAt: file.addedAt
+            });
+        });
+        
+        // Notificar peer sobre a pasta compartilhada
+        this.server.sendToPeer(peerId, {
+            type: 'folder-share',
+            folder: folderForSharing,
+            from: this.server.serverId,
+            fromName: this.server.settings.serverName
+        });
+        
+        this.saveFolders();
+        this.server.showNotification(`Pasta "${folder.name}" compartilhada com ${peerId}`, 'success');
+        return true;
+    }
+    
+    // Adicionar arquivo à pasta
+    addFileToFolder(fileToken, folderId) {
+        const folder = this.folders.get(folderId);
+        const file = this.server.files.get(fileToken);
+        
+        if (!folder) {
+            this.server.showNotification('Pasta não encontrada', 'error');
+            return false;
+        }
+        
+        if (!file) {
+            this.server.showNotification('Arquivo não encontrado', 'error');
+            return false;
+        }
+        
+        folder.files.set(fileToken, {
+            ...file,
+            addedAt: new Date().toISOString()
+        });
+        
+        // Se a pasta é compartilhada, enviar arquivo para todos os peers
+        if (folder.isShared && folder.sharedWith.size > 0) {
+            folder.sharedWith.forEach(peerId => {
+                if (this.server.dataChannels.has(peerId) && 
+                    this.server.dataChannels.get(peerId).readyState === 'open') {
+                    
+                    this.pairing.shareFileWithPeer(fileToken, peerId, folderId);
+                }
+            });
+        }
+        
+        this.saveFolders();
+        this.server.showNotification(`Arquivo "${file.name}" adicionado à pasta "${folder.name}"`, 'success');
+        return true;
+    }
+    
+    // Remover arquivo da pasta
+    removeFileFromFolder(fileToken, folderId) {
+        const folder = this.folders.get(folderId);
+        if (!folder) return false;
+        
+        const removed = folder.files.delete(fileToken);
+        if (removed) {
+            this.saveFolders();
+            this.server.showNotification('Arquivo removido da pasta', 'success');
+        }
+        return removed;
+    }
+    
+    // Excluir pasta
+    deleteFolder(folderId) {
+        const folder = this.folders.get(folderId);
+        if (!folder) return false;
+        
+        // Verificar se é o dono da pasta
+        if (folder.owner !== this.server.serverId) {
+            this.server.showNotification('Apenas o dono pode excluir esta pasta', 'error');
+            return false;
+        }
+        
+        // Primeiro excluir subpastas recursivamente
+        folder.subfolders.forEach(subFolderId => {
+            this.deleteFolder(subFolderId);
+        });
+        
+        // Agora excluir a pasta
+        this.folders.delete(folderId);
+        this.saveFolders();
+        
+        this.server.showNotification(`Pasta "${folder.name}" excluída`, 'success');
+        return true;
+    }
+    
+    // Renomear pasta
+    renameFolder(folderId, newName) {
+        const folder = this.folders.get(folderId);
+        if (!folder) return false;
+        
+        const oldName = folder.name;
+        folder.name = newName;
+        folder.updatedAt = new Date().toISOString();
+        
+        this.saveFolders();
+        this.server.showNotification(`Pasta "${oldName}" renomeada para "${newName}"`, 'success');
+        return true;
+    }
+    
+    // Adicionar subpasta
+    addSubfolder(parentFolderId, folderName) {
+        const parentFolder = this.folders.get(parentFolderId);
+        if (!parentFolder) return null;
+        
+        const subFolderId = this.createFolder(folderName, parentFolderId);
+        parentFolder.subfolders.add(subFolderId);
+        
+        this.saveFolders();
+        return subFolderId;
+    }
+    
+    // Obter pasta por ID
+    getFolder(folderId) {
+        return this.folders.get(folderId);
+    }
+    
+    // Obter todas as pastas do usuário atual
+    getMyFolders() {
+        return Array.from(this.folders.values())
+            .filter(folder => folder.owner === this.server.serverId);
+    }
+    
+    // Obter pastas compartilhadas comigo
+    getSharedWithMeFolders() {
+        return Array.from(this.folders.values())
+            .filter(folder => folder.owner !== this.server.serverId && 
+                             folder.sharedWith.has(this.server.serverId));
+    }
+    
+    // Interface para gerenciar pastas - estrutura em árvore
+    getFolderTree() {
+        const rootFolders = Array.from(this.folders.values())
+            .filter(folder => !folder.parentId && folder.owner === this.server.serverId);
+        
+        const buildTree = (folders) => {
+            return folders.map(folder => ({
+                ...folder,
+                subfolders: buildTree(Array.from(this.folders.values())
+                    .filter(f => f.parentId === folder.id))
+            }));
+        };
+        
+        return buildTree(rootFolders);
+    }
+    
+    // ========== HANDLER PARA PASTAS COMPARTILHADAS ==========
+    handleFolderShare(peerId, message) {
+        console.log('Recebendo pasta compartilhada de:', peerId);
+        
+        const { folder, from, fromName } = message;
+        
+        try {
+            // Converter dados recebidos de volta para Map
+            const receivedFolder = {
+                id: folder.id,
+                name: `${folder.name} (de ${fromName})`,
+                parentId: folder.parentId,
+                created: folder.created,
+                files: new Map(Object.entries(folder.files || {})),
+                subfolders: new Set(folder.subfolders || []),
+                sharedWith: new Set(folder.sharedWith || []),
+                isShared: folder.isShared,
+                owner: folder.owner,
+                sharedBy: from,
+                sharedAt: new Date().toISOString()
+            };
+            
+            // Adicionar pasta ao sistema local
+            this.folders.set(folder.id, receivedFolder);
+            this.saveFolders();
+            
+            this.server.showNotification(`Pasta "${folder.name}" compartilhada por ${fromName}`, 'success');
+            
+            // Atualizar UI se necessário
+            if (typeof updateFoldersUI === 'function') {
+                updateFoldersUI(this.server, this);
+            }
+            
+        } catch (error) {
+            console.error('Erro ao processar pasta compartilhada:', error);
+            this.server.showNotification('Erro ao receber pasta compartilhada', 'error');
+        }
+    }
+    
+    // Buscar arquivos nas pastas
+    searchFilesInFolders(searchTerm) {
+        const results = [];
+        const term = searchTerm.toLowerCase();
+        
+        this.folders.forEach((folder, folderId) => {
+            // Buscar nos arquivos da pasta
+            folder.files.forEach((file, fileToken) => {
+                if (file.name.toLowerCase().includes(term) || 
+                    (file.description && file.description.toLowerCase().includes(term))) {
+                    results.push({
+                        type: 'file',
+                        file: file,
+                        folder: folder,
+                        folderId: folderId
+                    });
+                }
+            });
+            
+            // Buscar no nome da pasta
+            if (folder.name.toLowerCase().includes(term)) {
+                results.push({
+                    type: 'folder',
+                    folder: folder,
+                    folderId: folderId
+                });
+            }
+        });
+        
+        return results;
+    }
+    
+    // Estatísticas das pastas
+    getFolderStats() {
+        const stats = {
+            totalFolders: this.folders.size,
+            myFolders: 0,
+            sharedFolders: 0,
+            totalFiles: 0,
+            totalSize: 0
+        };
+        
+        this.folders.forEach(folder => {
+            if (folder.owner === this.server.serverId) {
+                stats.myFolders++;
+            } else {
+                stats.sharedFolders++;
+            }
+            
+            stats.totalFiles += folder.files.size;
+            
+            // Calcular tamanho total
+            folder.files.forEach(file => {
+                stats.totalSize += file.size || 0;
+            });
+        });
+        
+        return stats;
+    }
+    
+    // Carregar pastas do localStorage
+    loadFolders() {
+        try {
+            const saved = localStorage.getItem('sharedFolders');
+            if (saved) {
+                const foldersData = JSON.parse(saved);
+                
+                this.folders = new Map();
+                Object.entries(foldersData).forEach(([id, folderData]) => {
+                    // Reconstruir Maps e Sets
+                    this.folders.set(id, {
+                        ...folderData,
+                        files: new Map(Object.entries(folderData.files || {})),
+                        subfolders: new Set(folderData.subfolders || []),
+                        sharedWith: new Set(folderData.sharedWith || [])
+                    });
+                });
+                
+                console.log(`Carregadas ${this.folders.size} pastas do localStorage`);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar pastas:', error);
+            this.folders = new Map();
+        }
+    }
+    
+    // Salvar pastas no localStorage
+    saveFolders() {
+        try {
+            const foldersData = {};
+            
+            this.folders.forEach((folder, id) => {
+                // Converter Maps e Sets para objetos/arrays
+                foldersData[id] = {
+                    ...folder,
+                    files: Object.fromEntries(folder.files),
+                    subfolders: Array.from(folder.subfolders),
+                    sharedWith: Array.from(folder.sharedWith)
+                };
+            });
+            
+            localStorage.setItem('sharedFolders', JSON.stringify(foldersData));
+        } catch (error) {
+            console.error('Erro ao salvar pastas:', error);
+        }
+    }
+    
+    // Exportar dados da pasta (para backup)
+    exportFolderData(folderId) {
+        const folder = this.folders.get(folderId);
+        if (!folder) return null;
+        
+        return {
+            ...folder,
+            files: Object.fromEntries(folder.files),
+            subfolders: Array.from(folder.subfolders),
+            sharedWith: Array.from(folder.sharedWith)
+        };
+    }
+    
+    // Importar dados da pasta (de backup)
+    importFolderData(folderData) {
+        try {
+            const folderId = folderData.id || 'folder_' + Date.now();
+            
+            this.folders.set(folderId, {
+                ...folderData,
+                files: new Map(Object.entries(folderData.files || {})),
+                subfolders: new Set(folderData.subfolders || []),
+                sharedWith: new Set(folderData.sharedWith || [])
+            });
+            
+            this.saveFolders();
+            this.server.showNotification(`Pasta "${folderData.name}" importada com sucesso`, 'success');
+            return folderId;
+        } catch (error) {
+            console.error('Erro ao importar pasta:', error);
+            this.server.showNotification('Erro ao importar pasta', 'error');
+            return null;
+        }
+    }
+}
+
+// ========== CONFIGURAÇÃO DA UI DE PAREAMENTO ==========
+function setupPairingUI(server, pairingSystem) {
+    console.log('Configurando UI de pareamento...');
+    
+    // Conectar via token
+    const connectBtn = document.getElementById('connectViaTokenBtn');
+    const tokenInput = document.getElementById('pairingTokenInput');
+    
+    if (connectBtn && tokenInput) {
+        connectBtn.addEventListener('click', () => {
+            const token = tokenInput.value.trim();
+            if (!token) {
+                server.showNotification('Digite um token válido', 'error');
+                return;
+            }
+            
+            if (pairingSystem.connectViaToken(token)) {
+                server.showNotification('Conectando via token...', 'info');
+                tokenInput.value = '';
+            } else {
+                server.showNotification('Token inválido ou expirado', 'error');
+            }
+        });
+    }
+    
+    // Gerar token
+    const generateBtn = document.getElementById('generateTokenBtn');
+    const myTokenInput = document.getElementById('myPairingToken');
+    
+    if (generateBtn && myTokenInput) {
+        // Token atual é o serverId
+        myTokenInput.value = server.serverId;
+        
+        generateBtn.addEventListener('click', () => {
+            // Para este sistema, o "token" é o serverId
+            server.showNotification('Seu ID é seu token de pareamento', 'info');
+        });
+    }
+    
+    // Copiar token
+    const copyTokenBtn = document.getElementById('copyPairingToken');
+    if (copyTokenBtn && myTokenInput) {
+        copyTokenBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(myTokenInput.value).then(() => {
+                server.showNotification('Token copiado!', 'success');
+            });
+        });
+    }
+    
+    // Atualizar listas
+    updatePairingUI(server, pairingSystem);
+}
+
+// ========== ATUALIZAR INTERFACE DE PAREAMENTO ==========
+function updatePairingUI(server, pairingSystem) {
+    updatePairedUsersList(server, pairingSystem);
+    updatePendingRequestsList(server, pairingSystem);
+    updateAvailableUsersList(server, pairingSystem);
+}
+
+function updatePairedUsersList(server, pairingSystem) {
+    const list = document.getElementById('pairedUsersList');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    pairingSystem.pairedUsers.forEach((user, userId) => {
+        const li = document.createElement('li');
+        li.className = 'list-item';
+        
+        const isConnected = server.dataChannels.has(userId) && 
+                           server.dataChannels.get(userId).readyState === 'open';
+        
+        li.innerHTML = `
+            <div class="list-item-icon">
+                <span class="material-icons">${isConnected ? 'link' : 'link_off'}</span>
+            </div>
+            <div class="list-item-content">
+                <div class="list-item-title">${userId}</div>
+                <div class="list-item-subtitle">
+                    Pareado em: ${new Date(user.pairedAt).toLocaleDateString()} • 
+                    ${user.sharedFiles.size} arquivos compartilhados •
+                    ${isConnected ? 'Conectado' : 'Desconectado'}
+                </div>
+            </div>
+            <div class="list-item-actions">
+                <button class="button text view-files-btn" data-user="${userId}">
+                    <span class="material-icons">folder</span>
+                </button>
+                <button class="button text disconnect-btn" data-user="${userId}">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+        `;
+        
+        list.appendChild(li);
+    });
+    
+    // Adicionar event listeners
+    document.querySelectorAll('.view-files-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const userId = e.target.closest('button').getAttribute('data-user');
+            server.showNotification(`Abrindo arquivos de ${userId}`, 'info');
+        });
+    });
+    
+    document.querySelectorAll('.disconnect-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const userId = e.target.closest('button').getAttribute('data-user');
+            if (confirm(`Desparear de ${userId}?`)) {
+                pairingSystem.pairedUsers.delete(userId);
+                pairingSystem.savePairedUsers();
+                updatePairedUsersList(server, pairingSystem);
+                server.showNotification('Despareado com sucesso', 'success');
+            }
+        });
+    });
+}
+
+function updatePendingRequestsList(server, pairingSystem) {
+    const list = document.getElementById('pendingRequestsList');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    pairingSystem.pendingConnections.forEach((request, token) => {
+        if (request.status === 'received') {
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            
+            li.innerHTML = `
+                <div class="list-item-icon">
+                    <span class="material-icons">person_add</span>
+                </div>
+                <div class="list-item-content">
+                    <div class="list-item-title">${request.target}</div>
+                    <div class="list-item-subtitle">
+                        Pasta: ${request.folderName} • 
+                        Token: ${token}
+                    </div>
+                </div>
+                <div class="list-item-actions">
+                    <button class="button primary accept-request-btn" data-token="${token}">
+                        <span class="material-icons">check</span>
+                    </button>
+                    <button class="button text reject-request-btn" data-token="${token}">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+            `;
+            
+            list.appendChild(li);
+        }
+    });
+    
+    // Event listeners para aceitar/rejeitar
+    document.querySelectorAll('.accept-request-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const token = e.target.closest('button').getAttribute('data-token');
+            if (pairingSystem.acceptPairing(token)) {
+                server.showNotification('Pareamento aceito!', 'success');
+                updatePairingUI(server, pairingSystem);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.reject-request-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const token = e.target.closest('button').getAttribute('data-token');
+            if (pairingSystem.rejectPairing(token)) {
+                server.showNotification('Solicitação rejeitada', 'info');
+                updatePairingUI(server, pairingSystem);
+            }
+        });
+    });
+}
+
+function updateAvailableUsersList(server, pairingSystem) {
+    const list = document.getElementById('availableUsersList');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    server.peers.forEach((peer, peerId) => {
+        if (peerId !== server.serverId && !pairingSystem.pairedUsers.has(peerId)) {
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            
+            const isConnected = server.dataChannels.has(peerId) && 
+                               server.dataChannels.get(peerId).readyState === 'open';
+            
+            li.innerHTML = `
+                <div class="list-item-icon">
+                    <span class="material-icons">person</span>
+                </div>
+                <div class="list-item-content">
+                    <div class="list-item-title">${peer.name || 'Usuário Sem Nome'}</div>
+                    <div class="list-item-subtitle">
+                        ID: ${peerId} • 
+                        ${peer.files || 0} arquivos •
+                        ${isConnected ? 'Conectado' : 'Disponível'}
+                    </div>
+                </div>
+                <div class="list-item-actions">
+                    <button class="button primary pair-user-btn" data-user="${peerId}">
+                        <span class="material-icons">link</span>
+                        Parear
+                    </button>
+                </div>
+            `;
+            
+            list.appendChild(li);
+        }
+    });
+    
+    // Event listeners para parear
+    document.querySelectorAll('.pair-user-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const userId = e.target.closest('button').getAttribute('data-user');
+            const folderName = prompt('Nome da pasta compartilhada:', 'Compartilhado');
+            
+            if (folderName) {
+                const token = pairingSystem.createPairingRequest(userId, folderName);
+                server.showNotification(`Solicitação enviada para ${userId}`, 'info');
+            }
+        });
+    });
+}
 
         // Inicialização da Aplicação
         document.addEventListener('DOMContentLoaded', () => {
@@ -2551,6 +3865,13 @@
             
             // Inicializar servidor P2P
             const server = new CompleteP2PServer();
+            
+            // Após inicializar o server
+const pairingSystem = server.pairingSystem;
+const folderSystem = server.folderSystem;
+
+// Configurar UI de pareamento
+setupPairingUI(server, pairingSystem);
             
             // Configurar upload de arquivos
             const uploadBtn = document.getElementById('uploadBtn');
@@ -2797,4 +4118,4 @@
         });
     </script>
 </body>
-    </html>
+</html>
