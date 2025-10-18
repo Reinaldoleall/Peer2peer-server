@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Servidor P2P - Material Design</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+      /* CSS Material Design 3 completo e revisado */
+:root {
+    /* Paleta Primária */
+    --md-ref-palette-primary0: #000000;
+    --md-ref-palette-primary10: #001a41;
+    --md-ref-palette-primary20: #002e69;
+    --md-ref-palette-primary30: #004493;
+    --md-ref-palette-primary40: #005bbf;
+    --md-ref-palette-primary50: #2a75dc;
+    --md-ref-palette-primary60: #4d8ff8;
+    --md-ref-palette-primary70: #74a9ff;
+    --md-ref-palette-primary80: #9ec4ff;
+    --md-ref-palette-primary90: #d0e2ff;
+    --md-ref-palette-primary95: #eaf0ff;
+    --md-ref-palette-primary99: #fdfbff;
+    --md-ref-palette-primary100: #ffffff;
+
+    /* Paleta Secundária */
+    --md-ref-palette-secondary10: #0e1d37;
+    --md-ref-palette-secondary20: #24324d;
+    --md-ref-palette-secondary30: #3b4865;
+    --md-ref-palette-secondary40: #53607e;
+    --md-ref-palette-secondary50: #6b7998;
+    --md-ref-palette-secondary60: #8593b3;
+    --md-ref-palette-secondary70: #9fadce;
+    --md-ref-palette-secondary80: #bac8ea;
+    --md-ref-palette-secondary90: #d6e3ff;
+    --md-ref-palette-secondary95: #ecf0ff;
+
+    /* Paleta Terciária */
+    --md-ref-palette-tertiary10: #2c1250;
+    --md-ref-palette-tertiary20: #432968;
+    --md-ref-palette-tertiary30: #5b4082;
+    --md-ref-palette-tertiary40: #74589c;
+    --md-ref-palette-tertiary50: #8e71b8;
+    --md-ref-palette-tertiary60: #a98bd4;
+    --md-ref-palette-tertiary70: #c4a5f0;
+    --md-ref-palette-tertiary80: #dfc0ff;
+    --md-ref-palette-tertiary90: #f2dbff;
+    --md-ref-palette-tertiary95: #fbebff;
+
+    /* Paleta de Erro */
+    --md-ref-palette-error10: #410002;
+    --md-ref-palette-error20: #690005;
+    --md-ref-palette-error30: #93000a;
+    --md-ref-palette-error40: #ba1a1a;
+    --md-ref-palette-error50: #de3730;
+    --md-ref-palette-error60: #ff5449;
+    --md-ref-palette-error70: #ff897d;
+    --md-ref-palette-error80: #ffb4ab;
+    --md-ref-palette-error90: #ffdad6;
+    --md-ref-palette-error95: #ffedea;
+
+    /* Paleta Neutra */
+    --md-ref-palette-neutral10: #1a1c1e;
+    --md-ref-palette-neutral20: #2f3033;
+    --md-ref-palette-neutral30: #45474a;
+    --md-ref-palette-neutral40: #5d5e62;
+    --md-ref-palette-neutral50: #76777a;
+    --md-ref-palette-neutral60: #909094;
+    --md-ref-palette-neutral70: #aaabae;
+    --md-ref-palette-neutral80: #c6c6ca;
+    --md-ref-palette-neutral90: #e2e2e6;
+    --md-ref-palette-neutral95: #f1f0f4;
+    --md-ref-palette-neutral99: #fdfbff;
+    --md-ref-palette-neutral100: #ffffff;
+
+    /* Cores do Sistema */
+    --md-sys-color-primary: var(--md-ref-palette-primary40);
+    --md-sys-color-on-primary: var(--md-ref-palette-primary100);
+    --md-sys-color-primary-container: var(--md-ref-palette-primary90);
+    --md-sys-color-on-primary-container: var(--md-ref-palette-primary10);
+    
+    --md-sys-color-secondary: var(--md-ref-palette-secondary40);
+    --md-sys-color-on-secondary: var(--md-ref-palette-primary100);
+    --md-sys-color-secondary-container: var(--md-ref-palette-secondary90);
+    --md-sys-color-on-secondary-container: var(--md-ref-palette-secondary10);
+    
+    --md-sys-color-tertiary: var(--md-ref-palette-tertiary40);
+    --md-sys-color-on-tertiary: var(--md-ref-palette-primary100);
+    --md-sys-color-tertiary-container: var(--md-ref-palette-tertiary90);
+    --md-sys-color-on-tertiary-container: var(--md-ref-palette-tertiary10);
+    
+    --md-sys-color-error: var(--md-ref-palette-error40);
+    --md-sys-color-on-error: var(--md-ref-palette-primary100);
+    --md-sys-color-error-container: var(--md-ref-palette-error90);
+    --md-sys-color-on-error-container: var(--md-ref-palette-error10);
+    
+    --md-sys-color-background: var(--md-ref-palette-neutral99);
+    --md-sys-color-on-background: var(--md-ref-palette-neutral10);
+    
+    --md-sys-color-surface: var(--md-ref-palette-neutral99);
+    --md-sys-color-on-surface: var(--md-ref-palette-neutral10);
+    --md-sys-color-surface-variant: var(--md-ref-palette-neutral90);
+    --md-sys-color-on-surface-variant: var(--md-ref-palette-neutral30);
+    
+    --md-sys-color-outline: var(--md-ref-palette-neutral50);
+    --md-sys-color-outline-variant: var(--md-ref-palette-neutral80);
+    
+    --md-sys-color-shadow: var(--md-ref-palette-neutral0);
+    --md-sys-color-surface-tint: var(--md-ref-palette-primary40);
+    
+    --md-sys-color-inverse-surface: var(--md-ref-palette-neutral20);
+    --md-sys-color-inverse-on-surface: var(--md-ref-palette-neutral95);
+    --md-sys-color-inverse-primary: var(--md-ref-palette-primary80);
+    
+    /* Elevação (Sombras) */
+    --elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+    --elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px 2px rgba(0,0,0,0.15);
+    --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.3);
+    --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px rgba(0,0,0,0.3);
+    --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px rgba(0,0,0,0.3);
+    
+    /* Raio da Borda */
+    --radius-small: 8px;
+    --radius-medium: 12px;
+    --radius-large: 16px;
+    --radius-extra-large: 28px;
+    
+    /* Animações */
+    --animation-duration-short: 200ms;
+    --animation-duration-medium: 300ms;
+    --animation-duration-long: 500ms;
+}
+
+/* Reset Global e Configurações Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    max-width: 100%; /* Previne overflow horizontal */
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--md-sys-color-background);
+    color: var(--md-sys-color-on-background);
+    line-height: 1.5;
+    height: 100vh;
+    height: 100dvh; /* Altura dinâmica da viewport */
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Layout Principal */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    position: relative;
+}
+
+/* Barra de Navegação Lateral (Nav Drawer) */
+.nav-drawer {
+    width: min(280px, 85vw);
+    background: var(--md-sys-color-surface);
+    border-right: 1px solid var(--md-sys-color-outline-variant);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1000;
+    transform: translateX(0);
+    transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nav-drawer.hidden {
+    transform: translateX(-100%);
+}
+
+.nav-header {
+    padding: clamp(16px, 4vw, 24px) clamp(12px, 3vw, 16px) clamp(12px, 3vw, 16px);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    position: sticky;
+    top: 0;
+    background: var(--md-sys-color-surface);
+    z-index: 1;
+}
+
+.app-title {
+    font-size: clamp(18px, 4vw, 22px);
+    font-weight: 500;
+    color: var(--md-sys-color-primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    word-break: break-word;
+}
+
+.nav-items {
+    flex: 1;
+    padding: clamp(8px, 2vw, 16px) 0;
+    overflow-y: auto;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: clamp(10px, 2.5vw, 12px) clamp(12px, 3vw, 16px);
+    text-decoration: none;
+    color: var(--md-sys-color-on-surface-variant);
+    transition: all var(--animation-duration-short) ease;
+    border-radius: var(--radius-medium);
+    margin: 0 clamp(4px, 1vw, 8px) 4px;
+    font-size: clamp(14px, 3vw, 16px);
+}
+
+.nav-item.active {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    font-weight: 500;
+}
+
+.nav-item:hover:not(.active) {
+    background-color: rgba(0,0,0,0.04);
+}
+
+.nav-footer {
+    padding: 16px;
+    border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.status-indicator.online { background-color: #4CAF50; }
+.status-indicator.connecting { background-color: #FFC107; }
+.status-indicator.offline { background-color: #F44336; }
+
+/* Conteúdo Principal */
+.main-content {
+    flex: 1;
+    margin-left: min(280px, 85vw);
+    transition: margin-left var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.main-content.expanded {
+    margin-left: 0;
+}
+
+/* Barra Superior (Top App Bar) */
+.top-app-bar {
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 2vw, 16px);
+    box-shadow: var(--elevation-1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 64px;
+    flex-shrink: 0;
+}
+
+.menu-button, .icon-button {
+    background: none;
+    border: none;
+    color: var(--md-sys-color-on-surface);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--animation-duration-short) ease;
+    min-width: 44px;
+    min-height: 44px;
+    position: relative;
+}
+.menu-button:hover, .icon-button:hover {
+    background-color: rgba(0,0,0,0.08);
+}
+
+.page-title {
+    font-size: clamp(18px, 4vw, 22px);
+    font-weight: 500;
+    flex: 1;
+    word-break: break-word;
+    line-height: 1.2;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+}
+
+.badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Conteúdo da Página */
+.page-content {
+    padding: clamp(12px, 3vw, 24px);
+    max-width: 100%;
+    margin: 0 auto;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    scroll-behavior: smooth;
+}
+
+/* Cards */
+.card {
+    background: var(--md-sys-color-surface);
+    border-radius: var(--radius-large);
+    box-shadow: var(--elevation-1);
+    overflow: hidden;
+    margin-bottom: clamp(16px, 3vw, 24px);
+    transition: box-shadow var(--animation-duration-short) ease;
+    max-width: 100%;
+}
+.card:hover {
+    box-shadow: var(--elevation-2);
+}
+
+.card-header {
+    padding: clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px) 0;
+}
+
+.card-title {
+    font-size: clamp(18px, 4vw, 22px);
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.card-subtitle {
+    font-size: clamp(13px, 2.5vw, 14px);
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: clamp(12px, 2.5vw, 16px);
+}
+
+.card-content {
+    padding: 0 clamp(16px, 3vw, 24px) clamp(16px, 3vw, 24px);
+}
+
+/* Formulários */
+.form-group {
+    margin-bottom: clamp(16px, 3vw, 24px);
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: clamp(13px, 2.5vw, 14px);
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
+}
+
+.text-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.text-field input,
+.text-field textarea,
+.text-field select {
+    width: 100%;
+    padding: clamp(12px, 3vw, 16px);
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--radius-medium);
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+    font-size: clamp(14px, 3vw, 16px);
+    transition: all var(--animation-duration-short) ease;
+    min-height: 44px;
+}
+.text-field input:focus,
+.text-field textarea:focus,
+.text-field select:focus {
+    outline: none;
+    border-color: var(--md-sys-color-primary);
+    box-shadow: 0 0 0 2px var(--md-sys-color-primary-container);
+}
+.text-field .material-icons {
+    position: absolute;
+    right: 16px;
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+}
+.text-field select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+}
+input[type="file"] {
+    padding: 12px;
+}
+
+/* Botões */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: clamp(10px, 2.5vw, 12px) clamp(16px, 3vw, 24px);
+    border: none;
+    border-radius: var(--radius-extra-large);
+    font-size: clamp(13px, 2.5vw, 14px);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all var(--animation-duration-short) ease;
+    text-decoration: none;
+    min-height: 44px;
+    min-width: 44px;
+    vertical-align: middle;
+}
+.button.primary {
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+}
+.button.primary:hover {
+    box-shadow: var(--elevation-1);
+    transform: translateY(-1px);
+}
+.button.outlined {
+    background-color: transparent;
+    color: var(--md-sys-color-primary);
+    border: 1px solid var(--md-sys-color-outline);
+}
+.button.outlined:hover {
+    background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
+}
+.button.text {
+    background-color: transparent;
+    color: var(--md-sys-color-primary);
+    padding: 10px 12px;
+}
+.button.text:hover {
+    background-color: rgba(var(--md-ref-palette-primary40-rgb), 0.08);
+}
+
+/* Listas */
+.list {
+    list-style-type: none;
+}
+.list-item {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 3vw, 16px);
+    padding: clamp(12px, 3vw, 16px);
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    transition: background-color var(--animation-duration-short) ease;
+    min-height: 64px;
+}
+.list-item:last-child {
+    border-bottom: none;
+}
+.list-item:hover {
+    background-color: rgba(0,0,0,0.04);
+}
+
+.list-item-icon {
+    width: clamp(36px, 8vw, 40px);
+    height: clamp(36px, 8vw, 40px);
+    border-radius: 50%;
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.list-item-content {
+    flex: 1;
+}
+
+.list-item-title {
+    font-size: clamp(14px, 3vw, 16px);
+    font-weight: 500;
+    color: var(--md-sys-color-on-surface);
+    word-break: break-word;
+}
+
+.list-item-subtitle {
+    font-size: clamp(13px, 2.5vw, 14px);
+    color: var(--md-sys-color-on-surface-variant);
+    word-break: break-word;
+}
+
+/* Grid de Estatísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    gap: clamp(12px, 3vw, 16px);
+    margin: clamp(16px, 3vw, 24px) 0;
+}
+
+.stat-card {
+    background: var(--md-sys-color-surface);
+    border-radius: var(--radius-large);
+    padding: clamp(16px, 3vw, 24px);
+    box-shadow: var(--elevation-1);
+    transition: box-shadow var(--animation-duration-short) ease;
+    text-align: center;
+}
+.stat-card:hover {
+    box-shadow: var(--elevation-2);
+}
+
+.stat-value {
+    font-size: clamp(24px, 6vw, 36px);
+    font-weight: 300;
+    color: var(--md-sys-color-primary);
+    line-height: 1;
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.stat-label {
+    font-size: clamp(12px, 2.5vw, 14px);
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+/* FAB (Floating Action Button) */
+.fab {
+    position: fixed;
+    bottom: clamp(16px, 4vw, 24px);
+    right: clamp(16px, 4vw, 24px);
+    width: clamp(48px, 10vw, 56px);
+    height: clamp(48px, 10vw, 56px);
+    border-radius: 50%;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border: none;
+    box-shadow: var(--elevation-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--animation-duration-short) ease;
+    z-index: 100;
+    min-width: 44px;
+    min-height: 44px;
+}
+.fab:hover {
+    box-shadow: var(--elevation-4);
+    transform: scale(1.05);
+}
+
+/* Snackbar (Notificações) */
+.snackbar {
+    position: fixed;
+    bottom: clamp(16px, 4vw, 24px);
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    padding: clamp(12px, 3vw, 14px) clamp(12px, 3vw, 16px);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--elevation-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: min(600px, calc(100vw - 48px));
+    width: calc(100% - 48px);
+    z-index: 10000;
+    transition: transform var(--animation-duration-medium) cubic-bezier(0.4, 0, 0.2, 1);
+}
+.snackbar.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.snackbar-content {
+    flex: 1;
+}
+.snackbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.snackbar .button.text {
+    color: var(--md-sys-color-inverse-primary);
+}
+.snackbar .icon-button {
+    color: var(--md-sys-color-inverse-on-surface);
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    margin-bottom: clamp(16px, 3vw, 24px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+    padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
+    background: none;
+    border: none;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: clamp(12px, 2.5vw, 14px);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all var(--animation-duration-short) ease;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    min-height: 44px;
+}
+.tab.active {
+    color: var(--md-sys-color-primary);
+    border-bottom-color: var(--md-sys-color-primary);
+}
+
+/* Conteúdo das Tabs */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+/* Componentes Adicionais */
+.progress-container {
+    margin-top: 16px;
+}
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    margin-bottom: 4px;
+}
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: var(--md-sys-color-surface-variant);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background-color: var(--md-sys-color-primary);
+    border-radius: 3px;
+    transition: width var(--animation-duration-medium) ease;
+}
+
+.chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--md-sys-color-surface-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    padding: 6px 12px;
+    border-radius: var(--radius-small);
+    font-size: 13px;
+}
+.chip.primary {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.search-container {
+    position: relative;
+    margin-bottom: 16px;
+}
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--md-sys-color-on-surface-variant);
+}
+.search-field {
+    padding-left: 48px !important;
+}
+
+/* Animações */
+.fade-in {
+    animation: fadeIn var(--animation-duration-medium) ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* MEDIA QUERIES */
+
+/* Tablets e menores (768px) */
+@media (max-width: 768px) {
+    .nav-drawer {
+        transform: translateX(-100%);
+        width: 85vw;
+    }
+
+    .nav-drawer.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .page-content {
+        padding: 12px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+}
+
+/* Celulares grandes e menores (480px) */
+@media (max-width: 480px) {
+    .top-app-bar {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .page-content {
+        padding: 8px;
+    }
+
+    .card-header, .card-content {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .button {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Celulares pequenos (360px) */
+@media (max-width: 360px) {
+    .nav-drawer {
+        width: 90vw;
+    }
+
+    .page-content {
+        padding: 6px;
+    }
+    
+    .card-header, .card-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Orientação paisagem em celulares */
+@media (max-height: 500px) and (orientation: landscape) {
+    .top-app-bar {
+        min-height: 56px;
+        padding: 6px 12px;
+    }
+
+    .page-content {
+        padding: 8px;
+    }
+
+    .nav-drawer {
+        overflow-y: auto;
+    }
+}
+
+/* Prevenir zoom em inputs no iOS */
+@media screen and (max-width: 768px) {
+    input, textarea, select {
+        font-size: 16px !important;
+    }
+}
+
+/* Melhorias de toque */
+@media (hover: none) and (pointer: coarse) {
+    .button:hover, .fab:hover {
+        transform: none;
+    }
+    
+    .card:hover {
+        box-shadow: var(--elevation-1);
+    }
+    
+    .nav-item:hover {
+        background-color: transparent;
+    }
+    
+    .nav-item:active {
+        background-color: var(--md-sys-color-surface-variant);
+    }
+}
+
+/* Classes Utilitárias */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-16 {
+    margin-top: clamp(12px, 3vw, 16px);
+}
+
+.mb-16 {
+    margin-bottom: clamp(12px, 3vw, 16px);
+}
+
+.p-16 {
+    padding: clamp(12px, 3vw, 16px);
+}
+
+.w-full {
+    width: 100%;
+}
+
+/* Mídia responsiva */
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barra de Navegação Lateral -->
+        <nav class="nav-drawer" id="navDrawer">
+            <div class="nav-header">
+                <div class="app-title">
+                    <span class="material-icons">dns</span>
+                    Servidor P2P
+                </div>
+            </div>
+            
+            <div class="nav-items">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <span class="material-icons">dashboard</span>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item" data-page="upload">
+                    <span class="material-icons">cloud_upload</span>
+                    Upload de Arquivos
+                </a>
+                <a href="#" class="nav-item" data-page="files">
+                    <span class="material-icons">folder</span>
+                    Arquivos Compartilhados
+                </a>
+                <a href="#" class="nav-item" data-page="peers">
+                    <span class="material-icons">hub</span>
+                    Peers Conectados
+                </a>
+                <a href="#" class="nav-item" data-page="api">
+                    <span class="material-icons">code</span>
+                    API & Integração
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <span class="material-icons">settings</span>
+                    Configurações
+                </a>
+            </div>
+            
+            <div class="nav-footer">
+                <div class="connection-status">
+                    <div class="status-indicator online" id="globalStatus"></div>
+                    <span id="statusText">Conectado</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content" id="mainContent">
+            <!-- Top App Bar -->
+            <header class="top-app-bar">
+                <button class="menu-button" id="menuButton">
+                    <span class="material-icons">menu</span>
+                </button>
+                
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                
+                <div class="top-actions">
+                    <button class="icon-button" id="searchButton">
+                        <span class="material-icons">search</span>
+                    </button>
+                    <button class="icon-button" id="notificationsButton">
+                        <span class="material-icons">notifications</span>
+                        <span class="badge" id="notificationBadge">0</span>
+                    </button>
+                    <button class="icon-button" id="accountButton">
+                        <span class="material-icons">account_circle</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Conteúdo da Página -->
+            <div class="page-content">
+                <!-- Página: Dashboard -->
+                <div class="page" id="dashboard-page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalFiles">0</div>
+                            <div class="stat-label">Arquivos Compartilhados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="activePeers">0</div>
+                            <div class="stat-label">Peers Ativos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="storageUsed">0 MB</div>
+                            <div class="stat-label">Espaço Usado</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDownloads">0</div>
+                            <div class="stat-label">Downloads Totais</div>
+                        </div>
+                    </div>
+
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Status do Servidor</h2>
+                            <p class="card-subtitle">Informações em tempo real da rede P2P</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="networkHealth">100%</div>
+                                    <div class="stat-label">Saúde da Rede</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="uploadSpeed">0 KB/s</div>
+                                    <div class="stat-label">Velocidade Upload</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="downloadSpeed">0 KB/s</div>
+                                    <div class="stat-label">Velocidade Download</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="uptime">0h 0m</div>
+                                    <div class="stat-label">Tempo Online</div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-label">
+                                    <span>Uso de Armazenamento</span>
+                                    <span id="storagePercent">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="storageProgress" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Atividade Recente</h2>
+                            <p class="card-subtitle">Últimos arquivos enviados e downloads</p>
+                        </div>
+                        <div class="card-content">
+                            <ul class="list" id="recentActivity">
+                                <!-- Atividade será carregada aqui -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página: Upload -->
+                <div class="page hidden" id="upload-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Upload de Arquivos</h2>
+                            <p class="card-subtitle">Envie arquivos para compartilhar na rede P2P</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="form-label">Selecione o arquivo</label>
+                                <div class="text-field">
+                                    <input type="file" id="fileInput" class="w-full" multiple>
+                                    <span class="material-icons">attach_file</span>
+                                </div>
+                            </div>
+                            
+                            <div id="filePreview" class="hidden">
+                                <img id="previewImage" class="file-preview hidden">
+                                <div id="fileInfo" class="chips-container"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Nome do arquivo (opcional)</label>
+                                <div class="text-field">
+                                    <input type="text" id="fileName" placeholder="Deixe em branco para usar o nome original">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Descrição (opcional)</label>
+                                <div class="text-field">
+                                    <textarea id="fileDescription" rows="3" placeholder="Descreva o arquivo..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Configurações de Compartilhamento</label>
+                                <div class="chips-container">
+                                    <div class="chip">
+                                        <span class="material-icons">lock</span>
+                                        Privado
+                                    </div>
+                                    <div class="chip">
+                                        <span class="material-icons">schedule</span>
+                                        Expira em 7 dias
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Expiração</label>
+                                <div class="text-field">
+                                    <select id="fileExpiration">
+                                        <option value="1">1 dia</option>
+                                        <option value="7" selected>7 dias</option>
+                                        <option value="30">30 dias</option>
+                                        <option value="90">90 dias</option>
+                                        <option value="0">Nunca expira</option>
+                                    </select>
+                                    <span class="material-icons">arrow_drop_down</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Senha de Acesso (opcional)</label>
+                                <div class="text-field">
+                                    <input type="password" id="filePassword" placeholder="Proteja o arquivo com senha">
+                                    <span class="material-icons">vpn_key</span>
+                                </div>
+                            </div>
+                            
+                            <button id="uploadBtn" class="button primary w-full">
+                                <span class="material-icons">cloud_upload</span>
+                                Fazer Upload
+                            </button>
+                            
+                            <div class="progress-container hidden" id="uploadProgressContainer">
+                                <div class="progress-label">
+                                    <span>Enviando arquivo...</span>
+                                    <span id="uploadPercent">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="uploadProgressBar" style="width: 0%"></div>
+                                </div>
+                                <div class="transfer-speed" id="uploadSpeedText">Calculando velocidade...</div>
+                            </div>
+                            
+                            <div class="card hidden mt-16" id="uploadResult">
+                                <div class="card-content">
+                                    <h3 class="card-title">Upload Concluído!</h3>
+                                    <p>Seu arquivo foi enviado com sucesso e está disponível para compartilhamento.</p>
+                                    
+                                    <div class="form-group mt-16">
+                                        <label class="form-label">Token do Arquivo</label>
+                                        <div class="text-field">
+                                            <input type="text" id="fileToken" readonly>
+                                            <span class="material-icons" id="copyTokenBtn">content_copy</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">URL de Acesso</label>
+                                        <div class="text-field">
+                                            <input type="text" id="fileUrl" readonly>
+                                            <span class="material-icons" id="copyUrlBtn">content_copy</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">QR Code para Compartilhamento</label>
+                                        <div class="qr-code" id="qrCodeContainer">
+                                            <span class="material-icons">qr_code_2</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="chips-container">
+                                        <div class="chip primary" id="fileSecurityBadge">
+                                            <span class="material-icons">security</span>
+                                            Arquivo Protegido
+                                        </div>
+                                        <div class="chip" id="fileExpirationBadge">
+                                            <span class="material-icons">schedule</span>
+                                            Expira em 7 dias
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página: Arquivos -->
+                <div class="page hidden" id="files-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Arquivos Compartilhados</h2>
+                            <p class="card-subtitle">Gerencie todos os arquivos compartilhados</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="search-container">
+                                <span class="material-icons search-icon">search</span>
+                                <input type="text" id="fileSearch" class="text-field search-field" placeholder="Buscar arquivos...">
+                            </div>
+
+                            <div class="tabs">
+                                <button class="tab active" data-tab="all">Todos</button>
+                                <button class="tab" data-tab="active">Ativos</button>
+                                <button class="tab" data-tab="expired">Expirados</button>
+                                <button class="tab" data-tab="protected">Protegidos</button>
+                            </div>
+
+                            <div class="tab-content active" id="tab-all">
+                                <ul class="list" id="fileList">
+                                    <!-- Lista de arquivos será carregada aqui -->
+                                </ul>
+                            </div>
+
+                            <div class="text-center hidden" id="noFiles">
+                                <span class="material-icons" style="font-size: 64px; color: var(--md-sys-color-surface-variant);">folder_open</span>
+                                <p style="margin-top: 16px; color: var(--md-sys-color-on-surface-variant);">Nenhum arquivo compartilhado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página: Peers -->
+                <div class="page hidden" id="peers-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Peers Conectados</h2>
+                            <p class="card-subtitle">Rede P2P e conexões ativas</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="connectedPeers">0</div>
+                                    <div class="stat-label">Conectados</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="availablePeers">0</div>
+                                    <div class="stat-label">Disponíveis</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="networkLatency">0ms</div>
+                                    <div class="stat-label">Latência</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="dataTransferred">0 MB</div>
+                                    <div class="stat-label">Dados Transferidos</div>
+                                </div>
+                            </div>
+
+                            <div class="connection-status mb-16">
+                                <div class="status-indicator" id="peerStatusIndicator"></div>
+                                <span id="peerStatusText">Conectando à rede P2P...</span>
+                            </div>
+
+                            <ul class="list" id="peerList">
+                                <!-- Lista de peers será carregada aqui -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página: API -->
+                <div class="page hidden" id="api-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">API & Integração</h2>
+                            <p class="card-subtitle">Documentação completa da API</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="form-label">Sua Chave de API</label>
+                                <div class="text-field">
+                                    <input type="text" id="apiKey" readonly value="p2p_xxxxxxxxxxxxxxxx">
+                                    <span class="material-icons" id="copyApiKeyBtn">content_copy</span>
+                                </div>
+                            </div>
+
+                            <div class="tabs">
+                                <button class="tab active" data-tab="docs">Documentação</button>
+                                <button class="tab" data-tab="examples">Exemplos</button>
+                                <button class="tab" data-tab="testing">Teste da API</button>
+                            </div>
+
+                            <div class="tab-content active" id="tab-docs">
+                                <h3>Endpoints Disponíveis</h3>
+                                <div class="list">
+                                    <div class="list-item">
+                                        <div class="list-item-icon">
+                                            <span class="material-icons">cloud_upload</span>
+                                        </div>
+                                        <div class="list-item-content">
+                                            <div class="list-item-title">POST /api/upload</div>
+                                            <div class="list-item-subtitle">Upload de arquivos</div>
+                                        </div>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="list-item-icon">
+                                            <span class="material-icons">download</span>
+                                        </div>
+                                        <div class="list-item-content">
+                                            <div class="list-item-title">GET /api/file/:token</div>
+                                            <div class="list-item-subtitle">Download de arquivos</div>
+                                        </div>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="list-item-icon">
+                                            <span class="material-icons">info</span>
+                                        </div>
+                                        <div class="list-item-content">
+                                            <div class="list-item-title">GET /api/info/:token</div>
+                                            <div class="list-item-subtitle">Informações do arquivo</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Página: Configurações -->
+                <div class="page hidden" id="settings-page">
+                    <div class="card fade-in">
+                        <div class="card-header">
+                            <h2 class="card-title">Configurações do Servidor</h2>
+                            <p class="card-subtitle">Personalize seu servidor P2P</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Servidor</label>
+                                <div class="text-field">
+                                    <input type="text" id="serverName" value="Meu Servidor P2P">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Limite de Armazenamento</label>
+                                <div class="text-field">
+                                    <select id="storageLimit">
+                                        <option value="100">100 MB</option>
+                                        <option value="500">500 MB</option>
+                                        <option value="1000" selected>1 GB</option>
+                                        <option value="5000">5 GB</option>
+                                        <option value="0">Ilimitado</option>
+                                    </select>
+                                    <span class="material-icons">arrow_drop_down</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Tamanho Máximo por Arquivo</label>
+                                <div class="text-field">
+                                    <select id="maxFileSize">
+                                        <option value="10">10 MB</option>
+                                        <option value="50">50 MB</option>
+                                        <option value="100" selected>100 MB</option>
+                                        <option value="500">500 MB</option>
+                                    </select>
+                                    <span class="material-icons">arrow_drop_down</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Configurações de Rede</label>
+                                <div class="chips-container">
+                                    <div class="chip primary">
+                                        <span class="material-icons">wifi</span>
+                                        P2P Habilitado
+                                    </div>
+                                    <div class="chip">
+                                        <span class="material-icons">security</span>
+                                        Criptografia Ativa
+                                    </div>
+                                    <div class="chip">
+                                        <span class="material-icons">backup</span>
+                                        Backup Automático
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button id="saveSettings" class="button primary">
+                                    <span class="material-icons">save</span>
+                                    Salvar Configurações
+                                </button>
+                                <button id="resetSettings" class="button outlined">
+                                    <span class="material-icons">restore</span>
+                                    Restaurar Padrões
+                                </button>
+                                <button id="clearData" class="button text">
+                                    <span class="material-icons">delete</span>
+                                    Limpar Todos os Dados
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FAB para Upload Rápido -->
+    <button class="fab" id="quickUploadFab">
+        <span class="material-icons">add</span>
+    </button>
+
+    <!-- Snackbar para Notificações -->
+    <div class="snackbar" id="snackbar">
+        <div class="snackbar-content" id="snackbarMessage"></div>
+        <div class="snackbar-actions">
+            <button class="button text" id="snackbarAction"></button>
+            <button class="icon-button" id="snackbarClose">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Firebase (substitua com suas credenciais)
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyD8FxHqt1g2V-mmureRPQyYe6QCuRSieGI",
+  authDomain: "marketplaceconnect-af26d.firebaseapp.com",
+  databaseURL: "https://marketplaceconnect-af26d-default-rtdb.firebaseio.com",
+  projectId: "marketplaceconnect-af26d",
+  storageBucket: "marketplaceconnect-af26d.firebasestorage.app",
+  messagingSenderId: "768552546759",
+  appId: "1:768552546759:web:4367fc4a161ecf90c469e2",
+  measurementId: "G-7HHR78MHDP"
+};
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Servidor P2P Completo com todas as funcionalidades
+        class P2PServer {
+            constructor() {
+                this.files = JSON.parse(localStorage.getItem('p2pFiles')) || {};
+                this.settings = JSON.parse(localStorage.getItem('p2pSettings')) || this.getDefaultSettings();
+                this.stats = JSON.parse(localStorage.getItem('p2pStats')) || this.getDefaultStats();
+                this.peers = new Map();
+                this.connections = new Map();
+                
+                this.serverId = localStorage.getItem('serverId') || this.generateId();
+                this.apiKey = localStorage.getItem('apiKey') || this.generateApiKey();
+                
+                localStorage.setItem('serverId', this.serverId);
+                localStorage.setItem('apiKey', this.apiKey);
+                this.saveSettings();
+                this.saveStats();
+                
+                this.notifications = new NotificationSystem();
+                this.navigation = new NavigationSystem();
+                
+                this.initFirebase();
+                this.initP2P();
+                this.updateAllDisplays();
+                this.startBackgroundTasks();
+            }
+            
+            getDefaultSettings() {
+                return {
+                    serverName: "Meu Servidor P2P",
+                    storageLimit: 1000, // MB
+                    maxFileSize: 100, // MB
+                    autoExpire: 7, // dias
+                    enableP2P: true,
+                    enableEncryption: true,
+                    enableBackup: true,
+                    maxPeers: 50
+                };
+            }
+            
+            getDefaultStats() {
+                return {
+                    startTime: Date.now(),
+                    totalDownloads: 0,
+                    totalUploads: 0,
+                    dataTransferred: 0,
+                    activePeers: 0,
+                    networkHealth: 100
+                };
+            }
+            
+            generateId() {
+                return 'server_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+            }
+            
+            generateApiKey() {
+                return 'p2p_' + Math.random().toString(36).substr(2, 16);
+            }
+            
+            generateToken() {
+                return 'file_' + Math.random().toString(36).substr(2, 12) + '_' + Date.now().toString(36);
+            }
+            
+            initFirebase() {
+                try {
+                    // Registrar este servidor no Firebase
+                    this.serverRef = database.ref('servers/' + this.serverId);
+                    this.serverRef.set({
+                        id: this.serverId,
+                        name: this.settings.serverName,
+                        online: true,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                        files: Object.keys(this.files).length,
+                        peers: this.stats.activePeers
+                    });
+                    
+                    // Manter a presença atualizada
+                    this.serverRef.onDisconnect().update({
+                        online: false,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    
+                    // Escutar por outros servidores/peers
+                    this.serversRef = database.ref('servers');
+                    this.serversRef.on('value', (snapshot) => {
+                        this.updatePeerList(snapshot.val() || {});
+                    });
+                    
+                    this.notifications.success('Conectado ao Firebase');
+                } catch (error) {
+                    console.error('Erro ao conectar com Firebase:', error);
+                    this.notifications.error('Erro ao conectar com Firebase');
+                }
+            }
+            
+            initP2P() {
+                // Simulação de conexões P2P
+                this.updateConnectionStatus('Conectando à rede P2P...', 'connecting');
+                
+                setTimeout(() => {
+                    this.updateConnectionStatus('Conectado à rede P2P', 'online');
+                    this.simulateP2PNetwork();
+                }, 2000);
+            }
+            
+            simulateP2PNetwork() {
+                // Simular atividade de rede
+                setInterval(() => {
+                    // Atualizar peers ativos
+                    const activePeers = Math.floor(Math.random() * 15) + 5;
+                    this.stats.activePeers = activePeers;
+                    
+                    // Simular transferência de dados
+                    const uploadSpeed = Math.floor(Math.random() * 5000) + 1000;
+                    const downloadSpeed = Math.floor(Math.random() * 3000) + 500;
+                    const newData = Math.floor(Math.random() * 10) + 1;
+                    
+                    this.stats.dataTransferred += newData;
+                    
+                    // Atualizar UI
+                    document.getElementById('uploadSpeed').textContent = this.formatSpeed(uploadSpeed);
+                    document.getElementById('downloadSpeed').textContent = this.formatSpeed(downloadSpeed);
+                    document.getElementById('dataTransferred').textContent = this.formatFileSize(this.stats.dataTransferred * 1024 * 1024, true);
+                    document.getElementById('activePeers').textContent = activePeers;
+                    document.getElementById('connectedPeers').textContent = activePeers;
+                    
+                    this.saveStats();
+                    this.updateStats();
+                }, 3000);
+            }
+            
+            async uploadFile(file, name, description, expirationDays, password = '') {
+                return new Promise((resolve, reject) => {
+                    // Validações
+                    const maxSize = this.settings.maxFileSize * 1024 * 1024;
+                    if (file.size > maxSize) {
+                        reject(`Arquivo muito grande. Tamanho máximo: ${this.settings.maxFileSize}MB`);
+                        return;
+                    }
+                    
+                    const totalSize = Object.values(this.files).reduce((sum, f) => sum + f.size, 0);
+                    const storageLimit = this.settings.storageLimit * 1024 * 1024;
+                    if (this.settings.storageLimit > 0 && totalSize + file.size > storageLimit) {
+                        reject('Espaço de armazenamento insuficiente');
+                        return;
+                    }
+                    
+                    // Configurar progresso
+                    const progressBar = document.getElementById('uploadProgressBar');
+                    const progressContainer = document.getElementById('uploadProgressContainer');
+                    const percentEl = document.getElementById('uploadPercent');
+                    const speedEl = document.getElementById('uploadSpeedText');
+                    
+                    progressContainer.classList.remove('hidden');
+                    
+                    let progress = 0;
+                    let lastUpdate = Date.now();
+                    let bytesUploaded = 0;
+                    
+                    const interval = setInterval(() => {
+                        const now = Date.now();
+                        const timeDiff = now - lastUpdate;
+                        
+                        // Simular progresso realista
+                        const increment = Math.random() * 5 + 2;
+                        progress += increment;
+                        bytesUploaded += (file.size * increment) / 100;
+                        
+                        if (progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            
+                            // Criar entrada do arquivo
+                            const token = this.generateToken();
+                            const fileName = name || file.name;
+                            const expirationDate = expirationDays > 0 ? 
+                                new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000) : null;
+                            
+                            this.files[token] = {
+                                name: fileName,
+                                originalName: file.name,
+                                description: description,
+                                size: file.size,
+                                type: file.type,
+                                uploadDate: new Date().toISOString(),
+                                expirationDate: expirationDate,
+                                token: token,
+                                downloads: 0,
+                                password: password || null,
+                                isEncrypted: !!password,
+                                lastAccessed: null
+                            };
+                            
+                            // Atualizar estatísticas
+                            this.stats.totalUploads++;
+                            this.stats.dataTransferred += file.size / (1024 * 1024);
+                            
+                            // Salvar
+                            this.saveFiles();
+                            this.saveStats();
+                            
+                            // Atualizar Firebase
+                            if (this.serverRef) {
+                                this.serverRef.update({
+                                    files: Object.keys(this.files).length
+                                });
+                            }
+                            
+                            // Finalizar
+                            setTimeout(() => {
+                                progressContainer.classList.add('hidden');
+                            }, 1000);
+                            
+                            resolve(token);
+                        }
+                        
+                        // Atualizar UI
+                        progressBar.style.width = `${progress}%`;
+                        percentEl.textContent = `${Math.round(progress)}%`;
+                        
+                        // Calcular velocidade
+                        if (timeDiff > 0) {
+                            const speed = (bytesUploaded / timeDiff) * 1000;
+                            speedEl.textContent = `Velocidade: ${this.formatSpeed(speed)}`;
+                        }
+                        
+                        lastUpdate = now;
+                    }, 150);
+                });
+            }
+            
+            downloadFile(token, password = '') {
+                const file = this.files[token];
+                if (!file) {
+                    throw new Error('Arquivo não encontrado');
+                }
+                
+                // Verificar expiração
+                if (file.expirationDate && new Date(file.expirationDate) < new Date()) {
+                    this.deleteFile(token);
+                    throw new Error('Arquivo expirado');
+                }
+                
+                // Verificar senha
+                if (file.password && file.password !== password) {
+                    throw new Error('Senha incorreta');
+                }
+                
+                // Atualizar estatísticas
+                file.downloads++;
+                file.lastAccessed = new Date().toISOString();
+                this.stats.totalDownloads++;
+                this.saveFiles();
+                this.saveStats();
+                
+                // Simular download
+                this.notifications.success(`Iniciando download: ${file.name}`);
+                
+                // Criar link de download simulado
+                const blob = new Blob([`Conteúdo do arquivo: ${file.name}`], { type: file.type });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                return file;
+            }
+            
+            deleteFile(token) {
+                if (this.files[token]) {
+                    delete this.files[token];
+                    this.saveFiles();
+                    
+                    if (this.serverRef) {
+                        this.serverRef.update({
+                            files: Object.keys(this.files).length
+                        });
+                    }
+                    
+                    this.updateAllDisplays();
+                    return true;
+                }
+                return false;
+            }
+            
+            getFileInfo(token) {
+                const file = this.files[token];
+                if (!file) return null;
+                
+                if (file.expirationDate && new Date(file.expirationDate) < new Date()) {
+                    this.deleteFile(token);
+                    return null;
+                }
+                
+                return file;
+            }
+            
+            getFileUrl(token) {
+                return `${window.location.origin}/api/file/${token}`;
+            }
+            
+            updateAllDisplays() {
+                this.updateStats();
+                this.updateFileList();
+                this.updateRecentActivity();
+            }
+            
+            updateStats() {
+                const totalFiles = Object.keys(this.files).length;
+                const totalSize = Object.values(this.files).reduce((sum, file) => sum + file.size, 0);
+                const storageLimit = this.settings.storageLimit * 1024 * 1024;
+                const usagePercent = this.settings.storageLimit > 0 ? 
+                    Math.min((totalSize / storageLimit) * 100, 100) : 0;
+                
+                // Atualizar elementos da UI
+                document.getElementById('totalFiles').textContent = totalFiles;
+                document.getElementById('storageUsed').textContent = this.formatFileSize(totalSize, true);
+                document.getElementById('storagePercent').textContent = `${Math.round(usagePercent)}%`;
+                document.getElementById('storageProgress').style.width = `${usagePercent}%`;
+                document.getElementById('totalDownloads').textContent = this.stats.totalDownloads;
+                
+                // Calcular tempo online
+                const uptimeMs = Date.now() - this.stats.startTime;
+                const uptimeHours = Math.floor(uptimeMs / (1000 * 60 * 60));
+                const uptimeMinutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('uptime').textContent = `${uptimeHours}h ${uptimeMinutes}m`;
+                
+                document.getElementById('networkHealth').textContent = `${this.stats.networkHealth}%`;
+                document.getElementById('apiKey').value = this.apiKey;
+            }
+            
+            updateFileList() {
+                const fileList = document.getElementById('fileList');
+                const noFiles = document.getElementById('noFiles');
+                
+                fileList.innerHTML = '';
+                
+                const validFiles = Object.values(this.files).filter(file => {
+                    return !file.expirationDate || new Date(file.expirationDate) > new Date();
+                });
+                
+                if (validFiles.length === 0) {
+                    noFiles.classList.remove('hidden');
+                    return;
+                }
+                
+                noFiles.classList.add('hidden');
+                
+                validFiles.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    
+                    const fileIcon = this.getFileIcon(file.type);
+                    const expiresText = file.expirationDate ? 
+                        `Expira: ${new Date(file.expirationDate).toLocaleDateString()}` : 
+                        'Não expira';
+                    
+                    li.innerHTML = `
+                        <div class="file-type-icon">
+                            <span class="material-icons">${fileIcon}</span>
+                        </div>
+                        <div class="list-item-content">
+                            <div class="list-item-title">${file.name}</div>
+                            <div class="list-item-subtitle">
+                                ${this.formatFileSize(file.size)} • 
+                                ${file.downloads} downloads • 
+                                ${expiresText}
+                                ${file.description ? `<br>${file.description}` : ''}
+                            </div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="button text download-file-btn" data-token="${file.token}">
+                                <span class="material-icons">download</span>
+                            </button>
+                            <button class="button text share-file-btn" data-token="${file.token}">
+                                <span class="material-icons">share</span>
+                            </button>
+                            <button class="button text delete-file-btn" data-token="${file.token}">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    `;
+                    
+                    fileList.appendChild(li);
+                });
+                
+                // Adicionar event listeners
+                this.attachFileEventListeners();
+            }
+            
+            attachFileEventListeners() {
+                document.querySelectorAll('.download-file-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const token = e.target.closest('button').getAttribute('data-token');
+                        const file = this.files[token];
+                        
+                        if (file.password) {
+                            const password = prompt('Digite a senha do arquivo:');
+                            if (password) {
+                                try {
+                                    this.downloadFile(token, password);
+                                } catch (error) {
+                                    this.notifications.error(error.message);
+                                }
+                            }
+                        } else {
+                            try {
+                                this.downloadFile(token);
+                            } catch (error) {
+                                this.notifications.error(error.message);
+                            }
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.share-file-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const token = e.target.closest('button').getAttribute('data-token');
+                        this.shareFile(token);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-file-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const token = e.target.closest('button').getAttribute('data-token');
+                        if (confirm('Tem certeza que deseja excluir este arquivo?')) {
+                            this.deleteFile(token);
+                            this.notifications.success('Arquivo excluído com sucesso');
+                        }
+                    });
+                });
+            }
+            
+            shareFile(token) {
+                const file = this.files[token];
+                if (!file) return;
+                
+                const url = this.getFileUrl(token);
+                if (navigator.share) {
+                    navigator.share({
+                        title: file.name,
+                        text: file.description,
+                        url: url
+                    });
+                } else {
+                    navigator.clipboard.writeText(url).then(() => {
+                        this.notifications.success('URL copiada para a área de transferência');
+                    });
+                }
+            }
+            
+            updateRecentActivity() {
+                const activityList = document.getElementById('recentActivity');
+                const activities = [];
+                
+                // Adicionar arquivos recentes
+                Object.values(this.files)
+                    .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
+                    .slice(0, 5)
+                    .forEach(file => {
+                        activities.push({
+                            icon: 'cloud_upload',
+                            title: 'Novo arquivo enviado',
+                            subtitle: `${file.name} - ${this.formatTimeAgo(new Date(file.uploadDate))}`
+                        });
+                    });
+                
+                // Adicionar downloads recentes
+                Object.values(this.files)
+                    .filter(file => file.lastAccessed)
+                    .sort((a, b) => new Date(b.lastAccessed) - new Date(a.lastAccessed))
+                    .slice(0, 3)
+                    .forEach(file => {
+                        activities.push({
+                            icon: 'download',
+                            title: 'Download realizado',
+                            subtitle: `${file.name} - ${this.formatTimeAgo(new Date(file.lastAccessed))}`
+                        });
+                    });
+                
+                activityList.innerHTML = '';
+                activities.forEach(activity => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    li.innerHTML = `
+                        <div class="list-item-icon">
+                            <span class="material-icons">${activity.icon}</span>
+                        </div>
+                        <div class="list-item-content">
+                            <div class="list-item-title">${activity.title}</div>
+                            <div class="list-item-subtitle">${activity.subtitle}</div>
+                        </div>
+                    `;
+                    activityList.appendChild(li);
+                });
+            }
+            
+            updatePeerList(peers) {
+                const peerList = document.getElementById('peerList');
+                peerList.innerHTML = '';
+                
+                Object.values(peers).forEach(peer => {
+                    if (peer.id === this.serverId) return;
+                    
+                    const li = document.createElement('li');
+                    li.className = 'list-item';
+                    
+                    li.innerHTML = `
+                        <div class="peer-avatar">
+                            ${peer.name ? peer.name.charAt(0).toUpperCase() : 'P'}
+                        </div>
+                        <div class="list-item-content">
+                            <div class="list-item-title">${peer.name || 'Servidor Desconhecido'}</div>
+                            <div class="list-item-subtitle">
+                                ${peer.files || 0} arquivos • 
+                                ${peer.online ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+                        <div class="list-item-actions">
+                            <button class="button text connect-peer-btn" data-peer="${peer.id}">
+                                <span class="material-icons">link</span>
+                            </button>
+                        </div>
+                    `;
+                    
+                    peerList.appendChild(li);
+                });
+                
+                // Atualizar contador de peers disponíveis
+                const availablePeers = Object.values(peers).filter(p => p.id !== this.serverId && p.online).length;
+                document.getElementById('availablePeers').textContent = availablePeers;
+            }
+            
+            updateConnectionStatus(status, type = 'online') {
+                const indicator = document.getElementById('peerStatusIndicator');
+                const text = document.getElementById('peerStatusText');
+                const globalIndicator = document.getElementById('globalStatus');
+                const globalText = document.getElementById('statusText');
+                
+                indicator.className = `status-indicator ${type}`;
+                text.textContent = status;
+                globalIndicator.className = `status-indicator ${type}`;
+                globalText.textContent = status;
+            }
+            
+            getFileIcon(fileType) {
+                if (fileType.includes('image')) return 'image';
+                if (fileType.includes('video')) return 'movie';
+                if (fileType.includes('audio')) return 'audiotrack';
+                if (fileType.includes('pdf')) return 'picture_as_pdf';
+                if (fileType.includes('zip') || fileType.includes('rar')) return 'folder_zip';
+                if (fileType.includes('text') || fileType.includes('document')) return 'description';
+                return 'insert_drive_file';
+            }
+            
+            formatFileSize(bytes, short = false) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = short ? ['B', 'K', 'M', 'G'] : ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            formatSpeed(bytesPerSecond) {
+                if (bytesPerSecond < 1024) {
+                    return Math.round(bytesPerSecond) + ' B/s';
+                } else if (bytesPerSecond < 1024 * 1024) {
+                    return (bytesPerSecond / 1024).toFixed(1) + ' KB/s';
+                } else {
+                    return (bytesPerSecond / (1024 * 1024)).toFixed(1) + ' MB/s';
+                }
+            }
+            
+            formatTimeAgo(date) {
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffMins < 1) return 'agora mesmo';
+                if (diffMins < 60) return `${diffMins} min atrás`;
+                if (diffHours < 24) return `${diffHours} h atrás`;
+                return `${diffDays} dias atrás`;
+            }
+            
+            saveFiles() {
+                localStorage.setItem('p2pFiles', JSON.stringify(this.files));
+            }
+            
+            saveSettings() {
+                localStorage.setItem('p2pSettings', JSON.stringify(this.settings));
+            }
+            
+            saveStats() {
+                localStorage.setItem('p2pStats', JSON.stringify(this.stats));
+            }
+            
+            startBackgroundTasks() {
+                // Limpeza de arquivos expirados
+                setInterval(() => {
+                    let expiredCount = 0;
+                    Object.keys(this.files).forEach(token => {
+                        const file = this.files[token];
+                        if (file.expirationDate && new Date(file.expirationDate) < new Date()) {
+                            this.deleteFile(token);
+                            expiredCount++;
+                        }
+                    });
+                    
+                    if (expiredCount > 0) {
+                        this.notifications.info(`${expiredCount} arquivos expirados foram removidos`);
+                    }
+                }, 60000); // A cada minuto
+                
+                // Backup automático
+                setInterval(() => {
+                    if (this.settings.enableBackup) {
+                        this.saveFiles();
+                        this.saveStats();
+                    }
+                }, 30000); // A cada 30 segundos
+            }
+        }
+
+        // Sistema de Navegação
+        class NavigationSystem {
+            constructor() {
+                this.currentPage = 'dashboard';
+                this.init();
+            }
+            
+            init() {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = item.getAttribute('data-page');
+                        this.navigateTo(page);
+                    });
+                });
+                
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const tabName = e.target.getAttribute('data-tab');
+                        this.switchTab(tabName);
+                    });
+                });
+                
+                document.getElementById('menuButton').addEventListener('click', () => {
+                    this.toggleNavDrawer();
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 768 && 
+                        !e.target.closest('.nav-drawer') && 
+                        !e.target.closest('#menuButton')) {
+                        document.getElementById('navDrawer').classList.remove('mobile-open');
+                    }
+                });
+            }
+            
+            navigateTo(page) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+                
+                document.querySelectorAll('.page').forEach(pageEl => {
+                    pageEl.classList.add('hidden');
+                });
+                
+                document.getElementById(`${page}-page`).classList.remove('hidden');
+                document.getElementById('pageTitle').textContent = 
+                    document.querySelector(`[data-page="${page}"]`).textContent.trim();
+                
+                this.currentPage = page;
+                
+                if (window.innerWidth <= 768) {
+                    this.toggleNavDrawer(false);
+                }
+            }
+            
+            switchTab(tabName) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.getElementById(`tab-${tabName}`).classList.add('active');
+            }
+            
+            toggleNavDrawer(show) {
+                const navDrawer = document.getElementById('navDrawer');
+                if (show !== undefined) {
+                    if (show) {
+                        navDrawer.classList.add('mobile-open');
+                    } else {
+                        navDrawer.classList.remove('mobile-open');
+                    }
+                } else {
+                    navDrawer.classList.toggle('mobile-open');
+                }
+            }
+        }
+
+        // Sistema de Notificações
+        class NotificationSystem {
+            constructor() {
+                this.snackbar = document.getElementById('snackbar');
+                this.messageEl = document.getElementById('snackbarMessage');
+                this.actionEl = document.getElementById('snackbarAction');
+                this.closeBtn = document.getElementById('snackbarClose');
+                
+                this.closeBtn.addEventListener('click', () => {
+                    this.hide();
+                });
+            }
+            
+            show(message, type = 'default', actionText = '', actionCallback = null) {
+                this.messageEl.textContent = message;
+                this.snackbar.className = `snackbar ${type} show`;
+                
+                if (actionText && actionCallback) {
+                    this.actionEl.textContent = actionText;
+                    this.actionEl.onclick = actionCallback;
+                    this.actionEl.style.display = 'block';
+                } else {
+                    this.actionEl.style.display = 'none';
+                }
+                
+                setTimeout(() => {
+                    this.hide();
+                }, 5000);
+            }
+            
+            hide() {
+                this.snackbar.classList.remove('show');
+            }
+            
+            success(message, actionText = '', actionCallback = null) {
+                this.show(message, 'success', actionText, actionCallback);
+            }
+            
+            error(message, actionText = '', actionCallback = null) {
+                this.show(message, 'error', actionText, actionCallback);
+            }
+            
+            warning(message, actionText = '', actionCallback = null) {
+                this.show(message, 'warning', actionText, actionCallback);
+            }
+            
+            info(message, actionText = '', actionCallback = null) {
+                this.show(message, 'default', actionText, actionCallback);
+            }
+        }
+
+        // Inicialização da Aplicação
+        document.addEventListener('DOMContentLoaded', () => {
+            const server = new P2PServer();
+            
+            // Configurar upload de arquivos
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                const fileInput = document.getElementById('fileInput');
+                const fileName = document.getElementById('fileName').value;
+                const fileDescription = document.getElementById('fileDescription').value;
+                const fileExpiration = parseInt(document.getElementById('fileExpiration').value);
+                const filePassword = document.getElementById('filePassword').value;
+                
+                if (fileInput.files.length === 0) {
+                    server.notifications.error('Por favor, selecione um arquivo.');
+                    return;
+                }
+                
+                // Processar múltiplos arquivos
+                const files = Array.from(fileInput.files);
+                let completed = 0;
+                
+                files.forEach(file => {
+                    server.uploadFile(file, fileName || file.name, fileDescription, fileExpiration, filePassword)
+                        .then(token => {
+                            completed++;
+                            
+                            if (completed === files.length) {
+                                // Mostrar resultado para o último arquivo
+                                const resultCard = document.getElementById('uploadResult');
+                                document.getElementById('fileToken').value = token;
+                                document.getElementById('fileUrl').value = server.getFileUrl(token);
+                                
+                                // Atualizar badges
+                                const securityBadge = document.getElementById('fileSecurityBadge');
+                                const expirationBadge = document.getElementById('fileExpirationBadge');
+                                
+                                if (filePassword) {
+                                    securityBadge.innerHTML = '<span class="material-icons">security</span> Arquivo Protegido';
+                                } else {
+                                    securityBadge.innerHTML = '<span class="material-icons">public</span> Arquivo Público';
+                                }
+                                
+                                if (fileExpiration > 0) {
+                                    expirationBadge.innerHTML = `<span class="material-icons">schedule</span> Expira em ${fileExpiration} dias`;
+                                } else {
+                                    expirationBadge.innerHTML = '<span class="material-icons">all_inclusive</span> Nunca expira';
+                                }
+                                
+                                resultCard.classList.remove('hidden');
+                                server.notifications.success(`Upload concluído! ${files.length} arquivo(s) processado(s)`);
+                                
+                                // Limpar formulário
+                                fileInput.value = '';
+                                document.getElementById('fileName').value = '';
+                                document.getElementById('fileDescription').value = '';
+                                document.getElementById('filePassword').value = '';
+                            }
+                        })
+                        .catch(error => {
+                            server.notifications.error(error);
+                        });
+                });
+            });
+            
+            // Preview de arquivo
+            document.getElementById('fileInput').addEventListener('change', function() {
+                const file = this.files[0];
+                const preview = document.getElementById('filePreview');
+                const fileInfo = document.getElementById('fileInfo');
+                const previewImage = document.getElementById('previewImage');
+                
+                if (file) {
+                    preview.classList.remove('hidden');
+                    fileInfo.innerHTML = `
+                        <div class="chip">
+                            <span class="material-icons">description</span>
+                            ${file.name}
+                        </div>
+                        <div class="chip">
+                            <span class="material-icons">storage</span>
+                            ${server.formatFileSize(file.size)}
+                        </div>
+                        <div class="chip">
+                            <span class="material-icons">category</span>
+                            ${file.type || 'Desconhecido'}
+                        </div>
+                    `;
+                    
+                    if (file.type.startsWith('image/')) {
+                        previewImage.src = URL.createObjectURL(file);
+                        previewImage.classList.remove('hidden');
+                    } else {
+                        previewImage.classList.add('hidden');
+                    }
+                } else {
+                    preview.classList.add('hidden');
+                }
+            });
+            
+            // Botões de cópia
+            document.getElementById('copyTokenBtn').addEventListener('click', () => {
+                const tokenInput = document.getElementById('fileToken');
+                tokenInput.select();
+                document.execCommand('copy');
+                server.notifications.success('Token copiado para a área de transferência!');
+            });
+            
+            document.getElementById('copyUrlBtn').addEventListener('click', () => {
+                const urlInput = document.getElementById('fileUrl');
+                urlInput.select();
+                document.execCommand('copy');
+                server.notifications.success('URL copiada para a área de transferência!');
+            });
+            
+            document.getElementById('copyApiKeyBtn').addEventListener('click', () => {
+                const apiKeyInput = document.getElementById('apiKey');
+                apiKeyInput.select();
+                document.execCommand('copy');
+                server.notifications.success('Chave de API copiada!');
+            });
+            
+            // FAB de upload rápido
+            document.getElementById('quickUploadFab').addEventListener('click', () => {
+                server.navigation.navigateTo('upload');
+                document.getElementById('fileInput').click();
+            });
+            
+            // Configurações
+            document.getElementById('saveSettings').addEventListener('click', () => {
+                server.settings.serverName = document.getElementById('serverName').value;
+                server.settings.storageLimit = parseInt(document.getElementById('storageLimit').value);
+                server.settings.maxFileSize = parseInt(document.getElementById('maxFileSize').value);
+                
+                server.saveSettings();
+                server.updateAllDisplays();
+                server.notifications.success('Configurações salvas com sucesso!');
+            });
+            
+            document.getElementById('resetSettings').addEventListener('click', () => {
+                if (confirm('Restaurar configurações padrão?')) {
+                    server.settings = server.getDefaultSettings();
+                    server.saveSettings();
+                    
+                    document.getElementById('serverName').value = server.settings.serverName;
+                    document.getElementById('storageLimit').value = server.settings.storageLimit;
+                    document.getElementById('maxFileSize').value = server.settings.maxFileSize;
+                    
+                    server.updateAllDisplays();
+                    server.notifications.success('Configurações restauradas!');
+                }
+            });
+            
+            document.getElementById('clearData').addEventListener('click', () => {
+                if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            });
+            
+            // Busca de arquivos
+            document.getElementById('fileSearch').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const fileItems = document.querySelectorAll('.list-item');
+                
+                fileItems.forEach(item => {
+                    const fileName = item.querySelector('.list-item-title').textContent.toLowerCase();
+                    const fileDescription = item.querySelector('.list-item-subtitle').textContent.toLowerCase();
+                    
+                    if (fileName.includes(searchTerm) || fileDescription.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // API global para integração
+            window.P2PFileShare = {
+                uploadFile: async function(file, options = {}) {
+                    return await server.uploadFile(
+                        file, 
+                        options.name, 
+                        options.description, 
+                        options.expiration || 7, 
+                        options.password
+                    );
+                },
+                
+                downloadFile: function(token, password = '') {
+                    return server.downloadFile(token, password);
+                },
+                
+                getFileInfo: function(token) {
+                    return server.getFileInfo(token);
+                },
+                
+                getFileUrl: function(token) {
+                    return server.getFileUrl(token);
+                },
+                
+                getStats: function() {
+                    return server.stats;
+                }
+            };
+        });
+    </script>
+</body>
+</html>
