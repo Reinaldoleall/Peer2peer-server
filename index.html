@@ -3068,11 +3068,12 @@ class PairingSystem {
 handlePairingAccepted(peerId, message) {
     console.log('Pareamento aceito por:', peerId, message);
     
-    // CORREÇÃO: Remover da lista de pendentes corretamente
+    // CORREÇÃO: Itera sobre as conexões pendentes para encontrar e remover
+    // a solicitação original que foi enviada para este peerId.
     for (const [token, pending] of this.pendingConnections) {
         if (pending.target === peerId) {
             this.pendingConnections.delete(token);
-            break;
+            break; // Sai do laço assim que encontra a solicitação correta
         }
     }
     
@@ -3097,6 +3098,7 @@ handlePairingAccepted(peerId, message) {
         updatePairingUI(this.server, this);
     }
 }
+
     
     handlePairingRejected(peerId, message) {
         console.log('Pareamento rejeitado por:', peerId);
@@ -4151,4 +4153,4 @@ startPairingAutoRefresh(server, pairingSystem);
         });
     </script>
 </body>
-    </html>
+                                        </html>
