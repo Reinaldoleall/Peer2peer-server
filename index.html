@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Servidor P2P Robusto - Material Design</title>
-    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -982,7 +980,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Barra de Navegação Lateral -->
         <nav class="nav-drawer" id="navDrawer">
             <div class="nav-header">
                 <div class="app-title">
@@ -1030,9 +1027,7 @@
             </div>
         </nav>
 
-        <!-- Conteúdo Principal -->
         <main class="main-content" id="mainContent">
-            <!-- Top App Bar -->
             <header class="top-app-bar">
                 <button class="menu-button" id="menuButton">
                     <span class="material-icons">menu</span>
@@ -1054,9 +1049,7 @@
                 </div>
             </header>
 
-            <!-- Conteúdo da Página -->
             <div class="page-content">
-                <!-- Página: Dashboard -->
                 <div class="page" id="dashboard-page">
                     <div class="stats-grid">
                         <div class="stat-card">
@@ -1131,13 +1124,11 @@
                         </div>
                         <div class="card-content">
                             <ul class="list" id="recentActivity">
-                                <!-- Atividade será carregada aqui -->
-                            </ul>
+                                </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Página: Upload -->
                 <div class="page hidden" id="upload-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1268,7 +1259,6 @@
                     </div>
                 </div>
 
-                <!-- Página: Arquivos -->
                 <div class="page hidden" id="files-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1290,8 +1280,7 @@
 
                             <div class="tab-content active" id="tab-all">
                                 <ul class="list" id="fileList">
-                                    <!-- Lista de arquivos será carregada aqui -->
-                                </ul>
+                                    </ul>
                             </div>
 
                             <div class="text-center hidden" id="noFiles">
@@ -1302,7 +1291,6 @@
                     </div>
                 </div>
 
-                <!-- Página: Peers -->
                 <div class="page hidden" id="peers-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1335,13 +1323,11 @@
                             </div>
 
                             <ul class="list" id="peerList">
-                                <!-- Lista de peers será carregada aqui -->
-                            </ul>
+                                </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Página: Rede P2P -->
                 <div class="page hidden" id="network-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1350,8 +1336,7 @@
                         </div>
                         <div class="card-content">
                             <div class="network-map" id="networkMap">
-                                <!-- Mapa de rede será renderizado aqui -->
-                            </div>
+                                </div>
                             
                             <div class="stats-grid">
                                 <div class="stat-card">
@@ -1378,15 +1363,13 @@
                                 </div>
                                 <div class="card-content">
                                     <ul class="list" id="activeTransfers">
-                                        <!-- Transferências ativas serão listadas aqui -->
-                                    </ul>
+                                        </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Página: API -->
                 <div class="page hidden" id="api-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1444,7 +1427,6 @@
                     </div>
                 </div>
 
-                <!-- Página: Configurações -->
                 <div class="page hidden" id="settings-page">
                     <div class="card fade-in">
                         <div class="card-header">
@@ -1532,12 +1514,10 @@
         </main>
     </div>
 
-    <!-- FAB para Upload Rápido -->
     <button class="fab" id="quickUploadFab">
         <span class="material-icons">add</span>
     </button>
 
-    <!-- Snackbar para Notificações -->
     <div class="snackbar" id="snackbar">
         <div class="snackbar-content" id="snackbarMessage"></div>
         <div class="snackbar-actions">
@@ -2061,7 +2041,7 @@
                         'Não expira';
                     
                     li.innerHTML = `
-                        <div class="file-type-icon">
+                        <div class="list-item-icon">
                             <span class="material-icons">${fileIcon}</span>
                         </div>
                         <div class="list-item-content">
@@ -2228,8 +2208,8 @@
                     const capabilities = peer.capabilities ? peer.capabilities.join(', ') : 'Básico';
                     
                     li.innerHTML = `
-                        <div class="peer-avatar">
-                            ${peer.name ? peer.name.charAt(0).toUpperCase() : 'P'}
+                        <div class="list-item-icon">
+                           <span class="material-icons">computer</span>
                         </div>
                         <div class="list-item-content">
                             <div class="list-item-title">${peer.name || 'Servidor Desconhecido'}</div>
@@ -2579,6 +2559,30 @@
                 this.show(message, 'default', actionText, actionCallback);
             }
         }
+        
+        // Função utilitária para copiar texto
+        function copyToClipboard(text, notificationSystem, message) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    notificationSystem.success(message);
+                });
+            } else {
+                // Fallback para contextos não seguros (ex: file://)
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'absolute';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    notificationSystem.success(message);
+                } catch (err) {
+                    notificationSystem.error('Falha ao copiar');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
 
         // Inicialização da Aplicação
         document.addEventListener('DOMContentLoaded', () => {
@@ -2679,26 +2683,20 @@
                 }
             });
             
-            // Botões de cópia
+            // Botões de cópia (usando a nova função)
             document.getElementById('copyTokenBtn').addEventListener('click', () => {
                 const tokenInput = document.getElementById('fileToken');
-                tokenInput.select();
-                document.execCommand('copy');
-                server.notifications.success('Token copiado para a área de transferência!');
+                copyToClipboard(tokenInput.value, server.notifications, 'Token copiado!');
             });
             
             document.getElementById('copyUrlBtn').addEventListener('click', () => {
                 const urlInput = document.getElementById('fileUrl');
-                urlInput.select();
-                document.execCommand('copy');
-                server.notifications.success('URL copiada para a área de transferência!');
+                copyToClipboard(urlInput.value, server.notifications, 'URL copiada!');
             });
             
             document.getElementById('copyApiKeyBtn').addEventListener('click', () => {
                 const apiKeyInput = document.getElementById('apiKey');
-                apiKeyInput.select();
-                document.execCommand('copy');
-                server.notifications.success('Chave de API copiada!');
+                copyToClipboard(apiKeyInput.value, server.notifications, 'Chave de API copiada!');
             });
             
             // FAB de upload rápido
@@ -2744,7 +2742,7 @@
             // Busca de arquivos
             document.getElementById('fileSearch').addEventListener('input', (e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                const fileItems = document.querySelectorAll('.list-item');
+                const fileItems = document.querySelectorAll('#fileList .list-item');
                 
                 fileItems.forEach(item => {
                     const fileName = item.querySelector('.list-item-title').textContent.toLowerCase();
