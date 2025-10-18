@@ -1291,39 +1291,44 @@
 
         // Servidor P2P Completo com IndexedDB e Chunk Transfer
         class CompleteP2PServer {
-            constructor() {
-                this.files = new Map();
-                this.peers = new Map();
-                // No constructor do CompleteP2PServer, após this.initDatabase()
-this.pairingSystem = new PairingSystem(this);
-this.folderSystem = new SharedFolderSystem(this, this.pairingSystem);
-                this.rtcConnections = new Map();
-                this.dataChannels = new Map();
-                this.activeTransfers = new Map();
-                this.fileChunks = new Map(); // Armazena chunks por fileToken
-                this.downloadProgress = new Map(); // Progresso de downloads
-                
-                this.serverId = localStorage.getItem('serverId') || this.generateId();
-                this.apiKey = localStorage.getItem('apiKey') || this.generateApiKey();
-                
-                this.settings = JSON.parse(localStorage.getItem('p2pSettings')) || this.getDefaultSettings();
-                this.stats = JSON.parse(localStorage.getItem('p2pStats')) || this.getDefaultStats();
-                
-                localStorage.setItem('serverId', this.serverId);
-                localStorage.setItem('apiKey', this.apiKey);
-                this.saveSettings();
-                this.saveStats();
-                
-                this.initDatabase().then(() => {
-                    this.loadFilesFromDB();
-                    this.initFirebase();
-                    this.initP2P();
-                    this.updateAllDisplays();
-                    this.startBackgroundTasks();
-                    
-                    console.log('Servidor P2P Inicializado:', this.serverId);
-                });
-            }
+constructor() {
+    this.files = new Map();
+    this.peers = new Map();
+    this.rtcConnections = new Map();
+    this.dataChannels = new Map();
+    this.activeTransfers = new Map();
+    this.fileChunks = new Map();
+    this.downloadProgress = new Map();
+    
+    this.serverId = localStorage.getItem('serverId') || this.generateId();
+    this.apiKey = localStorage.getItem('apiKey') || this.generateApiKey();
+    
+    this.settings = JSON.parse(localStorage.getItem('p2pSettings')) || this.getDefaultSettings();
+    this.stats = JSON.parse(localStorage.getItem('p2pStats')) || this.getDefaultStats();
+    
+    localStorage.setItem('serverId', this.serverId);
+    localStorage.setItem('apiKey', this.apiKey);
+    this.saveSettings();
+    this.saveStats();
+    
+    // INICIALIZAÇÃO CORRETA DOS SISTEMAS
+    this.initDatabase().then(() => {
+        this.loadFilesFromDB();
+        this.initFirebase();
+        this.initP2P();
+        
+        // Inicializar sistemas de pareamento e pastas
+        this.pairingSystem = new PairingSystem(this);
+        this.folderSystem = new SharedFolderSystem(this, this.pairingSystem);
+        
+        this.updateAllDisplays();
+        this.startBackgroundTasks();
+        
+        console.log('Servidor P2P Inicializado:', this.serverId);
+        console.log('Sistema de Pareamento Inicializado');
+        console.log('Sistema de Pastas Inicializado');
+    });
+}
             
             // ========== INDEXEDDB ==========
             async initDatabase() {
@@ -1469,6 +1474,7 @@ this.folderSystem = new SharedFolderSystem(this, this.pairingSystem);
             }
             
             // ========== MÉTODO FALTANTE ==========
+// ========== MÉTODO FALTANTE ==========
 getCapabilities() {
     return [
         'p2p-direct', 
@@ -1588,14 +1594,12 @@ getCapabilities() {
             
             // ========== TRANSFERÊNCIA DE CHUNKS ==========
 handlePeerMessage(peerId, message) {
+    console.log(`Mensagem recebida de ${peerId}:`, message.type);
+    
     switch (message.type) {
         case 'request-chunk':
             this.handleChunkRequest(peerId, message);
             break;
-            // No método handlePeerMessage do CompleteP2PServer, ADICIONE:
-case 'unpair-notification':
-    this.pairingSystem.handleUnpairNotification(peerId, message);
-    break;
         case 'chunk-response':
             this.handleChunkResponse(peerId, message);
             break;
@@ -1608,22 +1612,44 @@ case 'unpair-notification':
         case 'download-request':
             this.handleDownloadRequest(peerId, message);
             break;
-        // ========== NOVOS HANDLERS ==========
+        case 'file-announcement':
+            console.log('Anúncio de arquivo recebido:', message.fileToken);
+            break;
+            
+        // ========== SISTEMA DE PAREAMENTO ==========
         case 'pairing-request':
-            this.pairingSystem.handlePairingRequest(peerId, message);
+            if (this.pairingSystem) {
+                this.pairingSystem.handlePairingRequest(peerId, message);
+            } else {
+                console.error('Sistema de pareamento não inicializado');
+            }
             break;
         case 'pairing-accepted':
-            this.pairingSystem.handlePairingAccepted(peerId, message);
+            if (this.pairingSystem) {
+                this.pairingSystem.handlePairingAccepted(peerId, message);
+            }
             break;
         case 'pairing-rejected':
-            this.pairingSystem.handlePairingRejected(peerId, message);
+            if (this.pairingSystem) {
+                this.pairingSystem.handlePairingRejected(peerId, message);
+            }
+            break;
+        case 'unpair-notification':
+            if (this.pairingSystem) {
+                this.pairingSystem.handleUnpairNotification(peerId, message);
+            }
             break;
         case 'file-share':
             this.handleFileShare(peerId, message);
             break;
         case 'folder-share':
-            this.folderSystem.handleFolderShare(peerId, message);
+            if (this.folderSystem) {
+                this.folderSystem.handleFolderShare(peerId, message);
+            }
             break;
+            
+        default:
+            console.log('Tipo de mensagem desconhecido:', message.type);
     }
 }
 
@@ -2767,6 +2793,37 @@ class PairingSystem {
         return token;
     }
     
+    // ========== MÉTODO PARA CONEXÃO DIRETA ==========
+connectDirectly(peerId) {
+    console.log('Tentando conexão direta com:', peerId);
+    
+    // Primeiro conectar via WebRTC
+    this.server.connectToPeer(peerId);
+    
+    // Aguardar conexão e depois enviar solicitação de pareamento
+    const checkConnection = setInterval(() => {
+        if (this.server.dataChannels.has(peerId) && 
+            this.server.dataChannels.get(peerId).readyState === 'open') {
+            
+            clearInterval(checkConnection);
+            
+            // Enviar solicitação de pareamento
+            this.createPairingRequest(peerId, 'Compartilhado');
+            this.server.showNotification(`Conexão estabelecida com ${peerId}`, 'success');
+        }
+    }, 1000);
+    
+    // Timeout após 10 segundos
+    setTimeout(() => {
+        clearInterval(checkConnection);
+        if (!this.server.dataChannels.has(peerId)) {
+            this.server.showNotification('Falha na conexão com o peer', 'error');
+        }
+    }, 10000);
+    
+    return true;
+}
+    
     // Aceitar pareamento
     acceptPairing(token) {
         const pending = this.pendingConnections.get(token);
@@ -2885,31 +2942,37 @@ class PairingSystem {
     
     // Conectar via token (método principal)
     connectViaToken(token) {
-        // Verificar se é um token de pareamento pendente
-        if (this.pendingConnections.has(token)) {
-            return this.acceptPairing(token);
-        }
-        
-        // Verificar se é um serverId (conexão direta)
-        if (token.startsWith('server_')) {
-            // Tentar conectar primeiro
-            this.server.connectToPeer(token);
-            
-            // Depois enviar solicitação de pareamento
-            setTimeout(() => {
-                if (this.server.dataChannels.has(token) && 
-                    this.server.dataChannels.get(token).readyState === 'open') {
-                    
-                    this.createPairingRequest(token, 'Compartilhado');
-                }
-            }, 2000);
-            
-            return true;
-        }
-        
+    if (!token || token.trim() === '') {
         this.server.showNotification('Token inválido', 'error');
         return false;
     }
+    
+    const cleanToken = token.trim();
+    
+    console.log('Tentando conectar com token:', cleanToken);
+    
+    // Verificar se é um token de pareamento pendente
+    if (this.pendingConnections.has(cleanToken)) {
+        console.log('Token encontrado como solicitação pendente');
+        return this.acceptPairing(cleanToken);
+    }
+    
+    // Verificar se é um serverId (conexão direta)
+    if (cleanToken.startsWith('server_')) {
+        console.log('Token identificado como serverId, conectando diretamente...');
+        return this.connectDirectly(cleanToken);
+    }
+    
+    // Verificar se é um token de pareamento
+    if (cleanToken.startsWith('pair_')) {
+        this.server.showNotification('Token de pareamento recebido. Aguardando confirmação...', 'info');
+        return true;
+    }
+    
+    console.log('Token não reconhecido:', cleanToken);
+    this.server.showNotification('Token inválido ou expirado', 'error');
+    return false;
+}
     
     // Criar pasta compartilhada
     createSharedFolder(peerId, folderName) {
@@ -3068,30 +3131,30 @@ class PairingSystem {
 handlePairingAccepted(peerId, message) {
     console.log('Pareamento aceito por:', peerId, message);
     
-    // CORREÇÃO: Itera sobre as conexões pendentes para encontrar e remover
-    // a solicitação original que foi enviada para este peerId.
+    // CORREÇÃO: Remove todas as solicitações pendentes para este peer
     for (const [token, pending] of this.pendingConnections) {
         if (pending.target === peerId) {
             this.pendingConnections.delete(token);
-            break; // Sai do laço assim que encontra a solicitação correta
         }
     }
     
     const pairedUser = {
         id: peerId,
-        name: message.fromName,
+        name: message.fromName || peerId,
         pairedAt: new Date().toISOString(),
-        folderName: 'Compartilhado com ' + message.fromName,
+        folderName: 'Compartilhado com ' + (message.fromName || peerId),
         sharedFiles: new Set(),
         lastSeen: new Date().toISOString(),
         connectionStatus: 'connected'
     };
     
     this.pairedUsers.set(peerId, pairedUser);
+    
+    // Criar pasta compartilhada
     this.createSharedFolder(peerId, pairedUser.folderName);
     this.savePairedUsers();
     
-    this.server.showNotification(`Pareamento estabelecido com ${message.fromName}`, 'success');
+    this.server.showNotification(`Pareamento estabelecido com ${message.fromName || peerId}`, 'success');
     
     // Atualizar UI
     if (typeof updatePairingUI === 'function') {
@@ -3665,18 +3728,49 @@ function setupPairingUI(server, pairingSystem) {
     if (connectBtn && tokenInput) {
         connectBtn.addEventListener('click', () => {
             const token = tokenInput.value.trim();
+            console.log('Token inserido para conexão:', token);
+            
             if (!token) {
                 server.showNotification('Digite um token válido', 'error');
                 return;
             }
             
+            // Mostrar feedback visual do botão
+            connectBtn.disabled = true;
+            connectBtn.innerHTML = '<span class="material-icons">sync</span> Conectando...';
+            
             if (pairingSystem.connectViaToken(token)) {
-                server.showNotification('Conectando via token...', 'info');
+                server.showNotification('Processando conexão...', 'info');
                 tokenInput.value = '';
+                
+                // Restaurar botão após 3 segundos
+                setTimeout(() => {
+                    connectBtn.disabled = false;
+                    connectBtn.innerHTML = '<span class="material-icons">link</span> Conectar';
+                    updatePairingUI(server, pairingSystem);
+                }, 3000);
             } else {
-                server.showNotification('Token inválido ou expirado', 'error');
+                server.showNotification('Falha na conexão. Verifique o token e tente novamente.', 'error');
+                // Restaurar botão imediatamente em caso de erro
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '<span class="material-icons">link</span> Conectar';
             }
         });
+        
+        // Permitir pressionar Enter para conectar
+        tokenInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                connectBtn.click();
+            }
+        });
+        
+        // Focar no input automaticamente quando a página carregar
+        setTimeout(() => {
+            if (document.getElementById('paired-page') && 
+                !document.getElementById('paired-page').classList.contains('hidden')) {
+                tokenInput.focus();
+            }
+        }, 500);
     }
     
     // Gerar token
@@ -3688,8 +3782,25 @@ function setupPairingUI(server, pairingSystem) {
         myTokenInput.value = server.serverId;
         
         generateBtn.addEventListener('click', () => {
-            // Para este sistema, o "token" é o serverId
-            server.showNotification('Seu ID é seu token de pareamento', 'info');
+            // Feedback visual do botão
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="material-icons">autorenew</span> Gerando...';
+            
+            // Simular geração (na verdade é instantâneo pois usamos serverId)
+            setTimeout(() => {
+                // Para este sistema, o "token" é o serverId
+                server.showNotification('Seu ID é seu token de pareamento. Compartilhe este ID com outras pessoas para conectar.', 'info');
+                
+                // Restaurar botão
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<span class="material-icons">autorenew</span> Gerar Novo Token';
+                
+                // Destacar o token por um momento
+                myTokenInput.style.backgroundColor = 'var(--md-sys-color-primary-container)';
+                setTimeout(() => {
+                    myTokenInput.style.backgroundColor = '';
+                }, 2000);
+            }, 500);
         });
     }
     
@@ -3698,13 +3809,47 @@ function setupPairingUI(server, pairingSystem) {
     if (copyTokenBtn && myTokenInput) {
         copyTokenBtn.addEventListener('click', () => {
             navigator.clipboard.writeText(myTokenInput.value).then(() => {
+                server.showNotification('Token copiado para a área de transferência!', 'success');
+                
+                // Feedback visual do botão de copiar
+                copyTokenBtn.innerHTML = 'check';
+                copyTokenBtn.style.color = 'var(--md-sys-color-primary)';
+                
+                setTimeout(() => {
+                    copyTokenBtn.innerHTML = 'content_copy';
+                    copyTokenBtn.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                // Fallback para navegadores mais antigos
+                myTokenInput.select();
+                document.execCommand('copy');
                 server.showNotification('Token copiado!', 'success');
             });
         });
     }
     
-    // Atualizar listas
+    // Atualizar automaticamente quando na página de pareamento
+    const refreshPairingData = () => {
+        if (document.getElementById('paired-page') && 
+            !document.getElementById('paired-page').classList.contains('hidden')) {
+            updatePairingUI(server, pairingSystem);
+        }
+    };
+    
+    // Atualizar a cada 5 segundos quando na página
+    setInterval(refreshPairingData, 5000);
+    
+    // Atualizar listas inicial
     updatePairingUI(server, pairingSystem);
+    
+    console.log('UI de pareamento configurada com sucesso');
+}
+
+// Função auxiliar para verificar se estamos na página de pareamento
+function isOnPairingPage() {
+    const pairedPage = document.getElementById('paired-page');
+    return pairedPage && !pairedPage.classList.contains('hidden');
 }
 
 // ========== ATUALIZAR INTERFACE DE PAREAMENTO ==========
